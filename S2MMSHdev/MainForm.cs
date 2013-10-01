@@ -21,7 +21,7 @@ namespace S2MMSH
         {
             InitializeComponent();
         }
-        private DevicesCollection myDevices = null;
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             this.textBox_ffmpegPath.Text = Properties.Settings.Default.ffmpegpath;
@@ -51,10 +51,14 @@ namespace S2MMSH
             this.textBox_log.AppendText("アプリケーションが開始しました。\r\n");
 
             // デバイスリストを取得してリストボックスに
-            myDevices = new DevicesCollection();
-            foreach (DeviceInformation dev in myDevices)
+            CaptureDevicesCollection myDevices = new CaptureDevicesCollection();
+            foreach (DeviceInformation devInfo in myDevices)
             {
-                this.textBox_log.AppendText(dev.ToString());
+                
+                string strDesc = devInfo.Description;
+                Guid guid = devInfo.DriverGuid;
+                string strModule = devInfo.ModuleName;
+                this.textBox_log.AppendText(strDesc+"\r\n");
             }
         }
 
