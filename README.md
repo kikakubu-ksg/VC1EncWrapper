@@ -3,7 +3,8 @@ S2MMSH
 
 なんでも実況V　ストリーミング変換サーバ
 
-#（急募）誰かアイコン作って  
+##STORM (Stream to relayable MMSH)に変わる模様  
+※reliableではない可能性が高い 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kikakubu-ksg/s2mmsh/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
