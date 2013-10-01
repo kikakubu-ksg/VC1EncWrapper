@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.DirectX.DirectSound;
 
 namespace S2MMSH
 {
@@ -20,7 +21,7 @@ namespace S2MMSH
         {
             InitializeComponent();
         }
-
+        private DevicesCollection myDevices = null;
         private void MainForm_Load(object sender, EventArgs e)
         {
             this.textBox_ffmpegPath.Text = Properties.Settings.Default.ffmpegpath;
@@ -48,6 +49,13 @@ namespace S2MMSH
             logoutputDelegate = new LogoutputDelegate(logoutput);
             this.button_disconnect.Enabled = false;
             this.textBox_log.AppendText("アプリケーションが開始しました。\r\n");
+
+            // デバイスリストを取得してリストボックスに
+            myDevices = new DevicesCollection();
+            foreach (DeviceInformation dev in myDevices)
+            {
+                this.textBox_log.AppendText(dev.ToString());
+            }
         }
 
         private void button_ffmpegPathReffer_Click(object sender, EventArgs e)
