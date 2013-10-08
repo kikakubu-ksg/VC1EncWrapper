@@ -154,5 +154,29 @@ namespace S2MMSH.Properties {
                 this["enc_framerate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ffmpegcom_flag {
+            get {
+                return ((bool)(this["ffmpegcom_flag"]));
+            }
+            set {
+                this["ffmpegcom_flag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ffmpegcom {
+            get {
+                return ((string)(this["ffmpegcom"]));
+            }
+            set {
+                this["ffmpegcom"] = value;
+            }
+        }
     }
 }

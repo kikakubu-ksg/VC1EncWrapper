@@ -15,6 +15,8 @@ namespace S2MMSH
         //private Thread th_server = null;
         //private Thread th_ffmpeg = null;
         public LogoutputDelegate logoutputDelegate;
+        public ConnectButtonDelegate connectButtonStateDeligate;
+        public DisconnectButtonDelegate disconnectButtonStateDeligate;
 
         public MainForm()
         {
@@ -39,13 +41,36 @@ namespace S2MMSH
                 groupBox_reencode.Enabled = false;
             }
 
+            if (Properties.Settings.Default.ffmpegcom_flag)
+            { // 再エンコあり
+                radioButton_ffmpegcom_1.Checked = true;
+                textBox_ffmpegcom.Enabled = true;
+            }
+            else
+            {
+                radioButton_ffmpegcom_2.Checked = true;
+                textBox_ffmpegcom.Enabled = false;
+            }
+
             this.textBox_enc_width.Text = Properties.Settings.Default.enc_width;
             this.textBox_enc_height.Text = Properties.Settings.Default.enc_height;
             this.textBox_enc_bitrate_v.Text = Properties.Settings.Default.enc_bitrate_v;
             this.textBox_enc_bitrate_a.Text = Properties.Settings.Default.enc_bitrate_a;
-            this.textBox_enc_framerate.Text = Properties.Settings.Default.enc_framerate; 
+            this.textBox_enc_framerate.Text = Properties.Settings.Default.enc_framerate;
+
+            this.textBox_ffmpegcom.Text = Properties.Settings.Default.ffmpegcom;
 
             logoutputDelegate = new LogoutputDelegate(logoutput);
+            connectButtonStateDeligate = new ConnectButtonDelegate(connectButtonState);
+            disconnectButtonStateDeligate = new DisconnectButtonDelegate(disconnectButtonState);
+
+            //自分自身のAssemblyを取得
+            System.Reflection.Assembly asm =
+                System.Reflection.Assembly.GetExecutingAssembly();
+            //バージョンの取得
+            System.Version ver = asm.GetName().Version;
+            this.label_version.Text = "Ver. " + ver.ToString() ;
+            
             this.button_disconnect.Enabled = false;
             this.textBox_log.AppendText("アプリケーションが開始しました。\r\n");
         }
@@ -116,52 +141,58 @@ namespace S2MMSH
                             // " -v quiet -i tcp://127.0.0.1:6665 -c copy -f asf_stream -";
                             ProcessStartInfo startInfo = new ProcessStartInfo();
                             startInfo.FileName = this.textBox_ffmpegPath.Text;
-
-                            string url = this.textBox_inputstream.Text;
-                            url = System.Text.RegularExpressions.Regex.Replace(
-                                url,
-                                @"^mms://",
-                                "mmsh://");
-                            url = System.Text.RegularExpressions.Regex.Replace(
-                               url,
-                               @"^http://",
-                               "mmsh://");
-                            if (this.radioButton_reencode_1.Checked == false)
-                            {
-                                startInfo.Arguments = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
+                            if (this.radioButton_ffmpegcom_1.Checked) {
+                                startInfo.Arguments = this.textBox_ffmpegcom.Text;
                             }
-                            else {
-                                int width = 0;
-                                int height = 0;
-                                int bitrate_v = 0;
-                                int bitrate_a = 0;
-                                float framerate = 0;
-                                try
+                            else
+                            {
+                                string url = this.textBox_inputstream.Text;
+                                url = System.Text.RegularExpressions.Regex.Replace(
+                                    url,
+                                    @"^mms://",
+                                    "mmsh://");
+                                url = System.Text.RegularExpressions.Regex.Replace(
+                                   url,
+                                   @"^http://",
+                                   "mmsh://");
+                                if (this.radioButton_reencode_1.Checked == false)
                                 {
-                                    width = int.Parse(this.textBox_enc_width.Text);
-                                    height = int.Parse(this.textBox_enc_height.Text);
-                                    bitrate_v = int.Parse(this.textBox_enc_bitrate_v.Text) * 1000;
-                                    bitrate_a = int.Parse(this.textBox_enc_bitrate_a.Text) * 1000;
-                                    framerate = float.Parse(this.textBox_enc_framerate.Text);
-                                }
-                                catch (Exception)
-                                {
-                                    logoutput("エンコード設定が不正です。再エンコードしません。");
                                     startInfo.Arguments = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
                                 }
-                                string strsize = String.Format("{0}x{1}", width, height);
-                                if (width == 0 || height == 0) strsize = "320x240";
-                                if (bitrate_v == 0) bitrate_v = 256000;
-                                if (bitrate_a == 0) bitrate_a = 128000;
-                                if (framerate == 0) framerate = 15;
+                                else
+                                {
+                                    int width = 0;
+                                    int height = 0;
+                                    int bitrate_v = 0;
+                                    int bitrate_a = 0;
+                                    float framerate = 0;
+                                    try
+                                    {
+                                        width = int.Parse(this.textBox_enc_width.Text);
+                                        height = int.Parse(this.textBox_enc_height.Text);
+                                        bitrate_v = int.Parse(this.textBox_enc_bitrate_v.Text) * 1000;
+                                        bitrate_a = int.Parse(this.textBox_enc_bitrate_a.Text) * 1000;
+                                        framerate = float.Parse(this.textBox_enc_framerate.Text);
+                                    }
+                                    catch (Exception)
+                                    {
+                                        logoutput("エンコード設定が不正です。再エンコードしません。");
+                                        startInfo.Arguments = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
+                                    }
+                                    string strsize = String.Format("{0}x{1}", width, height);
+                                    if (width == 0 || height == 0) strsize = "320x240";
+                                    if (bitrate_v == 0) bitrate_v = 256000;
+                                    if (bitrate_a == 0) bitrate_a = 128000;
+                                    if (framerate == 0) framerate = 15;
 
-                                startInfo.Arguments = String.Format(
-                                    " -v error -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -", 
-                                    url,
-                                    bitrate_a,
-                                    bitrate_v,
-                                    strsize,
-                                    framerate);
+                                    startInfo.Arguments = String.Format(
+                                        " -v error -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -",
+                                        url,
+                                        bitrate_a,
+                                        bitrate_v,
+                                        strsize,
+                                        framerate);
+                                }
                             }
                             //startInfo.Arguments = " -v quiet -i tcp://127.0.0.1:6665 -c copy -f asf_stream -";
                             //startInfo.Arguments = " -v quiet -i rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov -c copy -f asf_stream -";
@@ -177,14 +208,14 @@ namespace S2MMSH
                             pm.process.StartInfo = startInfo;
                             pm.process.Start();
 
-                            pm.process.BeginErrorReadLine();
+                            pm.process.BeginErrorReadLine(); // 標準エラーは別スレッドでとる
 
                             int c = 0;
                             const int nBytes = 65535;
                             byte[] buf = new byte[nBytes];
+                            
+                            // 標準出力はこのスレッドでとる
                             BinaryReader br = new BinaryReader(pm.process.StandardOutput.BaseStream);
-
-                            // StandardOutputからの入力待ちがあるため、別スレッド上で動かす必要がある
                             Boolean flg = true;
                             AsfData asfData = AsfData.Instance;
                             while (flg)
@@ -351,6 +382,7 @@ namespace S2MMSH
         "エラー",
         MessageBoxButtons.OK,
         MessageBoxIcon.Error);
+                            ProcessInitialize();
                             
                         }
                         // todo 初期化
@@ -364,16 +396,19 @@ namespace S2MMSH
             this.button_disconnect.Enabled = true;
         }
 
-        private void p_Exited(object sender, EventArgs e)
+        /// <summary>
+        /// プロセス破棄
+        /// </summary>
+        private void ProcessInitialize()
         {
             ProcessManager pm = ProcessManager.Instance;
-            //プロセスが終了したときに実行される
-            logoutput("ffmpegが終了しました。");
 
             if (pm.ffmpegstatus == FFMPEG_STATUS.FFMPEG_STATUS_PROCESS) // 初期化
             {
                 pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZING;
-                this.button_disconnect.Enabled = false;
+                //this.button_disconnect.Enabled = false;
+                //disconnectButtonStateDeligate(false);
+                this.BeginInvoke(new Action<Boolean>(delegate(Boolean bl) { this.disconnectButtonStateDeligate(false); }), new object[] { false });
                 if (pm.process != null)
                 {
                     pm.process.Dispose();
@@ -388,13 +423,6 @@ namespace S2MMSH
                     pm.th_server = null;
                 }
 
-                if (pm.th_ffmpeg != null)
-                {
-                    if (pm.th_ffmpeg.IsAlive)
-                        pm.th_ffmpeg.Abort();
-                    pm.th_ffmpeg = null;
-                }
-
                 // 初期化
                 AsfData asfData = AsfData.Instance;
                 asfData.asf_status = ASF_STATUS.ASF_STATUS_NULL;
@@ -403,12 +431,31 @@ namespace S2MMSH
                 asfData.mms_sock = null;
                 asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
 
-                this.button_exec.Enabled = true;
+                //this.button_exec.Enabled = true;
+                //connectButtonStateDeligate(true);
+                this.BeginInvoke(new Action<Boolean>(delegate(Boolean bl) { this.connectButtonStateDeligate(true); }), new object[] { true });
 
-                logoutput("接続を初期化しました。");
+                //logoutput("接続を初期化しました。");
+                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("接続を初期化しました。"); }), new object[] { "" });
 
                 pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZED;
+
+                // スレッド自身の削除
+                if (pm.th_ffmpeg != null)
+                {
+                    Thread tmp = pm.th_ffmpeg;
+                    pm.th_ffmpeg = null;
+                    if (tmp.IsAlive)
+                        tmp.Abort(); // ここでスレッドは終了
+                }
             }
+        }
+
+        private void p_Exited(object sender, EventArgs e)
+        {
+            //プロセスが終了したときに実行される
+            logoutput("ffmpegが終了しました。");
+            ProcessInitialize();
         }
 
         private void PrintErrorData(object sender, DataReceivedEventArgs e)
@@ -476,10 +523,10 @@ namespace S2MMSH
             {
                 if (!pm.process.HasExited)
                 {
-                    pm.process.CancelOutputRead();
+                    // pm.process.CancelOutputRead();
                     pm.process.CancelErrorRead();
                     pm.process.Kill();
-                    pm.process.WaitForExit();
+                    //pm.process.WaitForExit();
                 }
 
                 pm.process = null;
@@ -508,6 +555,9 @@ namespace S2MMSH
             Properties.Settings.Default.enc_bitrate_v = this.textBox_enc_bitrate_v.Text;
             Properties.Settings.Default.enc_bitrate_a = this.textBox_enc_bitrate_a.Text;
             Properties.Settings.Default.enc_framerate = this.textBox_enc_framerate.Text;
+
+            Properties.Settings.Default.ffmpegcom_flag = radioButton_ffmpegcom_1.Checked;
+            Properties.Settings.Default.ffmpegcom = this.textBox_ffmpegcom.Text;
 
             Properties.Settings.Default.Save();
             
@@ -577,19 +627,21 @@ namespace S2MMSH
             }
         }
 
-        private void textBox_log_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         public delegate void LogoutputDelegate(String str);
         public void logoutput(String str) {
             this.textBox_log.AppendText(DateTime.Now.ToString() + " " + str + "\r\n");
         }
 
-        private void label9_Click(object sender, EventArgs e)
+        public delegate void ConnectButtonDelegate(Boolean bl);
+        public void connectButtonState(Boolean bl)
         {
+            this.button_exec.Enabled = bl;
+        }
 
+        public delegate void DisconnectButtonDelegate(Boolean bl);
+        public void disconnectButtonState(Boolean bl)
+        {
+            this.button_disconnect.Enabled = bl;
         }
 
         private void radioButton_reencode_1_CheckedChanged(object sender, EventArgs e)
@@ -614,14 +666,107 @@ namespace S2MMSH
             }
         }
 
+        private void textBox_ffmpegPath_DragDrop(object sender, DragEventArgs e)
+        {
+            //コントロール内にドロップされたとき実行される
+            //ドロップされたすべてのファイル名を取得する
+            string[] fileName =
+                (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            textBox_ffmpegPath.Text = fileName[0];
+        }
+
+        private void textBox_ffmpegPath_DragEnter(object sender, DragEventArgs e)
+        {
+            //コントロール内にドラッグされたとき実行される
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                //ドラッグされたデータ形式を調べ、ファイルのときはコピーとする
+                e.Effect = DragDropEffects.Copy;
+            else
+                //ファイル以外は受け付けない
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void radioButton_ffmpegcom_1_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton radioButton = sender as RadioButton;
+
+            if (radioButton.Checked)
+            {
+                Console.WriteLine(radioButton.Text + "が選択されました。");
+                textBox_ffmpegcom.Enabled = true;
+            }
+        }
+
+        private void radioButton_ffmpegcom_2_CheckedChanged(object sender, EventArgs e)
+        {
+            RadioButton radioButton = sender as RadioButton;
+
+            if (radioButton.Checked)
+            {
+                Console.WriteLine(radioButton.Text + "が選択されました。");
+                textBox_ffmpegcom.Enabled = false;
+            }
+        }
+
+        private void button_current_command_Click(object sender, EventArgs e)
+        {
+            string url = this.textBox_inputstream.Text;
+            url = System.Text.RegularExpressions.Regex.Replace(
+                url,
+                @"^mms://",
+                "mmsh://");
+            url = System.Text.RegularExpressions.Regex.Replace(
+               url,
+               @"^http://",
+               "mmsh://");
+            if (this.radioButton_reencode_1.Checked == false)
+            {
+                textBox_ffmpegcom.Text = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
+            }
+            else
+            {
+                int width = 0;
+                int height = 0;
+                int bitrate_v = 0;
+                int bitrate_a = 0;
+                float framerate = 0;
+                try
+                {
+                    width = int.Parse(this.textBox_enc_width.Text);
+                    height = int.Parse(this.textBox_enc_height.Text);
+                    bitrate_v = int.Parse(this.textBox_enc_bitrate_v.Text) * 1000;
+                    bitrate_a = int.Parse(this.textBox_enc_bitrate_a.Text) * 1000;
+                    framerate = float.Parse(this.textBox_enc_framerate.Text);
+                }
+                catch (Exception)
+                {
+                    //logoutput("エンコード設定が不正です。再エンコードしません。");
+                    textBox_ffmpegcom.Text = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
+                }
+                string strsize = String.Format("{0}x{1}", width, height);
+                if (width == 0 || height == 0) strsize = "320x240";
+                if (bitrate_v == 0) bitrate_v = 256000;
+                if (bitrate_a == 0) bitrate_a = 128000;
+                if (framerate == 0) framerate = 15;
+
+                textBox_ffmpegcom.Text = String.Format(
+                    " -v error -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -",
+                    url,
+                    bitrate_a,
+                    bitrate_v,
+                    strsize,
+                    framerate);
+            }
+        }
+
     }
 }
 
 
 //todo
-//D&D対応
+//D&D対応 OK
 //ASFコメント追加
-//EOF時の自動切断
+//EOF時の自動切断 OK
 //ffmpegコンソール直修
 //バージョン管理
 //プレイリストクラスの生成

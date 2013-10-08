@@ -66,15 +66,31 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.button_current_command = new System.Windows.Forms.Button();
+            this.textBox_ffmpegcom = new System.Windows.Forms.TextBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.radioButton_ffmpegcom_2 = new System.Windows.Forms.RadioButton();
+            this.label20 = new System.Windows.Forms.Label();
+            this.radioButton_ffmpegcom_1 = new System.Windows.Forms.RadioButton();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label_version = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.groupBox_reencode.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // button_exec
             // 
-            this.button_exec.Location = new System.Drawing.Point(14, 261);
+            this.button_exec.Location = new System.Drawing.Point(7, 299);
             this.button_exec.Name = "button_exec";
-            this.button_exec.Size = new System.Drawing.Size(448, 23);
+            this.button_exec.Size = new System.Drawing.Size(463, 23);
             this.button_exec.TabIndex = 15;
             this.button_exec.Text = "接続";
             this.button_exec.UseVisualStyleBackColor = true;
@@ -82,7 +98,7 @@
             // 
             // button_ffmpegPathReffer
             // 
-            this.button_ffmpegPathReffer.Location = new System.Drawing.Point(425, 2);
+            this.button_ffmpegPathReffer.Location = new System.Drawing.Point(419, 6);
             this.button_ffmpegPathReffer.Name = "button_ffmpegPathReffer";
             this.button_ffmpegPathReffer.Size = new System.Drawing.Size(38, 23);
             this.button_ffmpegPathReffer.TabIndex = 2;
@@ -93,7 +109,7 @@
             // label_ffmpegPath
             // 
             this.label_ffmpegPath.AutoSize = true;
-            this.label_ffmpegPath.Location = new System.Drawing.Point(12, 9);
+            this.label_ffmpegPath.Location = new System.Drawing.Point(6, 13);
             this.label_ffmpegPath.Name = "label_ffmpegPath";
             this.label_ffmpegPath.Size = new System.Drawing.Size(59, 12);
             this.label_ffmpegPath.TabIndex = 2;
@@ -102,7 +118,7 @@
             // label_exPort
             // 
             this.label_exPort.AutoSize = true;
-            this.label_exPort.Location = new System.Drawing.Point(12, 235);
+            this.label_exPort.Location = new System.Drawing.Point(6, 239);
             this.label_exPort.Name = "label_exPort";
             this.label_exPort.Size = new System.Drawing.Size(57, 12);
             this.label_exPort.TabIndex = 3;
@@ -110,23 +126,26 @@
             // 
             // textBox_ffmpegPath
             // 
-            this.textBox_ffmpegPath.Location = new System.Drawing.Point(91, 6);
+            this.textBox_ffmpegPath.AllowDrop = true;
+            this.textBox_ffmpegPath.Location = new System.Drawing.Point(85, 10);
             this.textBox_ffmpegPath.Name = "textBox_ffmpegPath";
             this.textBox_ffmpegPath.Size = new System.Drawing.Size(328, 19);
             this.textBox_ffmpegPath.TabIndex = 1;
+            this.textBox_ffmpegPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox_ffmpegPath_DragDrop);
+            this.textBox_ffmpegPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox_ffmpegPath_DragEnter);
             // 
             // textBox_exPort
             // 
-            this.textBox_exPort.Location = new System.Drawing.Point(77, 233);
+            this.textBox_exPort.Location = new System.Drawing.Point(71, 237);
             this.textBox_exPort.Name = "textBox_exPort";
             this.textBox_exPort.Size = new System.Drawing.Size(57, 19);
             this.textBox_exPort.TabIndex = 14;
             // 
             // button_disconnect
             // 
-            this.button_disconnect.Location = new System.Drawing.Point(14, 290);
+            this.button_disconnect.Location = new System.Drawing.Point(7, 328);
             this.button_disconnect.Name = "button_disconnect";
-            this.button_disconnect.Size = new System.Drawing.Size(448, 23);
+            this.button_disconnect.Size = new System.Drawing.Size(463, 23);
             this.button_disconnect.TabIndex = 16;
             this.button_disconnect.Text = "切断";
             this.button_disconnect.UseVisualStyleBackColor = true;
@@ -134,7 +153,7 @@
             // 
             // textBox_inputstream
             // 
-            this.textBox_inputstream.Location = new System.Drawing.Point(91, 31);
+            this.textBox_inputstream.Location = new System.Drawing.Point(85, 35);
             this.textBox_inputstream.Name = "textBox_inputstream";
             this.textBox_inputstream.Size = new System.Drawing.Size(371, 19);
             this.textBox_inputstream.TabIndex = 3;
@@ -142,7 +161,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 34);
+            this.label1.Location = new System.Drawing.Point(6, 38);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 12);
             this.label1.TabIndex = 9;
@@ -151,7 +170,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 64);
+            this.label2.Location = new System.Drawing.Point(6, 68);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 12);
             this.label2.TabIndex = 10;
@@ -160,7 +179,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(141, 64);
+            this.label3.Location = new System.Drawing.Point(135, 68);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(29, 12);
             this.label3.TabIndex = 11;
@@ -169,7 +188,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(298, 64);
+            this.label4.Location = new System.Drawing.Point(292, 68);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(29, 12);
             this.label4.TabIndex = 12;
@@ -177,7 +196,7 @@
             // 
             // textBox_videorate
             // 
-            this.textBox_videorate.Location = new System.Drawing.Point(176, 61);
+            this.textBox_videorate.Location = new System.Drawing.Point(170, 65);
             this.textBox_videorate.Name = "textBox_videorate";
             this.textBox_videorate.Size = new System.Drawing.Size(60, 19);
             this.textBox_videorate.TabIndex = 4;
@@ -185,7 +204,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(243, 64);
+            this.label5.Location = new System.Drawing.Point(237, 68);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(29, 12);
             this.label5.TabIndex = 14;
@@ -194,7 +213,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(399, 64);
+            this.label6.Location = new System.Drawing.Point(393, 68);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(29, 12);
             this.label6.TabIndex = 15;
@@ -202,7 +221,7 @@
             // 
             // textBox_audiorate
             // 
-            this.textBox_audiorate.Location = new System.Drawing.Point(333, 61);
+            this.textBox_audiorate.Location = new System.Drawing.Point(327, 65);
             this.textBox_audiorate.Name = "textBox_audiorate";
             this.textBox_audiorate.Size = new System.Drawing.Size(60, 19);
             this.textBox_audiorate.TabIndex = 5;
@@ -212,18 +231,17 @@
             this.textBox_log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_log.Location = new System.Drawing.Point(14, 341);
+            this.textBox_log.Location = new System.Drawing.Point(14, 379);
             this.textBox_log.Multiline = true;
             this.textBox_log.Name = "textBox_log";
             this.textBox_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_log.Size = new System.Drawing.Size(448, 81);
+            this.textBox_log.Size = new System.Drawing.Size(450, 83);
             this.textBox_log.TabIndex = 17;
-            this.textBox_log.TextChanged += new System.EventHandler(this.textBox_log_TextChanged);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(14, 320);
+            this.label7.Location = new System.Drawing.Point(12, 364);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(23, 12);
             this.label7.TabIndex = 18;
@@ -267,7 +285,7 @@
             this.panel1.Controls.Add(this.radioButton_reencode_2);
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.radioButton_reencode_1);
-            this.panel1.Location = new System.Drawing.Point(12, 86);
+            this.panel1.Location = new System.Drawing.Point(6, 90);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(200, 25);
             this.panel1.TabIndex = 22;
@@ -289,7 +307,7 @@
             this.groupBox_reencode.Controls.Add(this.label10);
             this.groupBox_reencode.Controls.Add(this.label9);
             this.groupBox_reencode.Enabled = false;
-            this.groupBox_reencode.Location = new System.Drawing.Point(12, 117);
+            this.groupBox_reencode.Location = new System.Drawing.Point(6, 121);
             this.groupBox_reencode.Name = "groupBox_reencode";
             this.groupBox_reencode.Size = new System.Drawing.Size(449, 110);
             this.groupBox_reencode.TabIndex = 23;
@@ -411,43 +429,159 @@
             this.label9.Size = new System.Drawing.Size(58, 12);
             this.label9.TabIndex = 0;
             this.label9.Text = "画面サイズ";
-            this.label9.Click += new System.EventHandler(this.label9_Click);
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(218, 93);
+            this.label18.Location = new System.Drawing.Point(212, 97);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(136, 12);
             this.label18.TabIndex = 26;
             this.label18.Text = "※CODECはWMV2/WMA2";
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Location = new System.Drawing.Point(3, 3);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(471, 290);
+            this.tabControl1.TabIndex = 27;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.label_ffmpegPath);
+            this.tabPage1.Controls.Add(this.label18);
+            this.tabPage1.Controls.Add(this.panel1);
+            this.tabPage1.Controls.Add(this.groupBox_reencode);
+            this.tabPage1.Controls.Add(this.button_ffmpegPathReffer);
+            this.tabPage1.Controls.Add(this.label_exPort);
+            this.tabPage1.Controls.Add(this.textBox_audiorate);
+            this.tabPage1.Controls.Add(this.textBox_ffmpegPath);
+            this.tabPage1.Controls.Add(this.label6);
+            this.tabPage1.Controls.Add(this.textBox_exPort);
+            this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.textBox_videorate);
+            this.tabPage1.Controls.Add(this.textBox_inputstream);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.label1);
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.label2);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(463, 264);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "基本設定";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.button_current_command);
+            this.tabPage2.Controls.Add(this.textBox_ffmpegcom);
+            this.tabPage2.Controls.Add(this.panel2);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(463, 264);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "上級者向け";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // button_current_command
+            // 
+            this.button_current_command.Location = new System.Drawing.Point(313, 8);
+            this.button_current_command.Name = "button_current_command";
+            this.button_current_command.Size = new System.Drawing.Size(139, 23);
+            this.button_current_command.TabIndex = 25;
+            this.button_current_command.Text = "現在のコマンドを貼り付け";
+            this.button_current_command.UseVisualStyleBackColor = true;
+            this.button_current_command.Click += new System.EventHandler(this.button_current_command_Click);
+            // 
+            // textBox_ffmpegcom
+            // 
+            this.textBox_ffmpegcom.Location = new System.Drawing.Point(7, 37);
+            this.textBox_ffmpegcom.Multiline = true;
+            this.textBox_ffmpegcom.Name = "textBox_ffmpegcom";
+            this.textBox_ffmpegcom.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox_ffmpegcom.Size = new System.Drawing.Size(450, 221);
+            this.textBox_ffmpegcom.TabIndex = 24;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.radioButton_ffmpegcom_2);
+            this.panel2.Controls.Add(this.label20);
+            this.panel2.Controls.Add(this.radioButton_ffmpegcom_1);
+            this.panel2.Location = new System.Drawing.Point(7, 6);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(285, 25);
+            this.panel2.TabIndex = 23;
+            // 
+            // radioButton_ffmpegcom_2
+            // 
+            this.radioButton_ffmpegcom_2.AutoSize = true;
+            this.radioButton_ffmpegcom_2.Checked = true;
+            this.radioButton_ffmpegcom_2.Location = new System.Drawing.Point(230, 5);
+            this.radioButton_ffmpegcom_2.Name = "radioButton_ffmpegcom_2";
+            this.radioButton_ffmpegcom_2.Size = new System.Drawing.Size(47, 16);
+            this.radioButton_ffmpegcom_2.TabIndex = 7;
+            this.radioButton_ffmpegcom_2.TabStop = true;
+            this.radioButton_ffmpegcom_2.Text = "無効";
+            this.radioButton_ffmpegcom_2.UseVisualStyleBackColor = true;
+            this.radioButton_ffmpegcom_2.CheckedChanged += new System.EventHandler(this.radioButton_ffmpegcom_2_CheckedChanged);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(0, 7);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(123, 12);
+            this.label20.TabIndex = 19;
+            this.label20.Text = "ffmpegコマンド直接修正";
+            // 
+            // radioButton_ffmpegcom_1
+            // 
+            this.radioButton_ffmpegcom_1.AutoSize = true;
+            this.radioButton_ffmpegcom_1.Location = new System.Drawing.Point(182, 5);
+            this.radioButton_ffmpegcom_1.Name = "radioButton_ffmpegcom_1";
+            this.radioButton_ffmpegcom_1.Size = new System.Drawing.Size(47, 16);
+            this.radioButton_ffmpegcom_1.TabIndex = 6;
+            this.radioButton_ffmpegcom_1.Text = "有効";
+            this.radioButton_ffmpegcom_1.UseVisualStyleBackColor = true;
+            this.radioButton_ffmpegcom_1.CheckedChanged += new System.EventHandler(this.radioButton_ffmpegcom_1_CheckedChanged);
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.label_version);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(463, 264);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "バージョン情報";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // label_version
+            // 
+            this.label_version.AutoSize = true;
+            this.label_version.Location = new System.Drawing.Point(26, 68);
+            this.label_version.Name = "label_version";
+            this.label_version.Size = new System.Drawing.Size(41, 12);
+            this.label_version.TabIndex = 0;
+            this.label_version.Text = "label19";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(474, 434);
-            this.Controls.Add(this.label18);
-            this.Controls.Add(this.groupBox_reencode);
+            this.ClientSize = new System.Drawing.Size(476, 474);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox_log);
-            this.Controls.Add(this.textBox_audiorate);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.textBox_videorate);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox_inputstream);
-            this.Controls.Add(this.button_disconnect);
-            this.Controls.Add(this.textBox_exPort);
-            this.Controls.Add(this.textBox_ffmpegPath);
-            this.Controls.Add(this.label_exPort);
-            this.Controls.Add(this.label_ffmpegPath);
-            this.Controls.Add(this.button_ffmpegPathReffer);
             this.Controls.Add(this.button_exec);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.button_disconnect);
             this.Name = "MainForm";
             this.Text = "Stream to MMSH";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -456,6 +590,15 @@
             this.panel1.PerformLayout();
             this.groupBox_reencode.ResumeLayout(false);
             this.groupBox_reencode.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -501,6 +644,17 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.RadioButton radioButton_ffmpegcom_2;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.RadioButton radioButton_ffmpegcom_1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox textBox_ffmpegcom;
+        private System.Windows.Forms.Button button_current_command;
+        private System.Windows.Forms.Label label_version;
     }
 }
 
