@@ -9,6 +9,7 @@ S2MMSH
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kikakubu-ksg/s2mmsh/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 ##Update
+2013/10/08 ffmpegのコマンドを直修できるようにした。  
 2013/10/08 ffmpegのエラーをログに出力するようにした。  
 
 ##What is this  
