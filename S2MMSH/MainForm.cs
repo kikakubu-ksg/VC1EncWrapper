@@ -81,6 +81,7 @@ namespace S2MMSH
             logoutputDelegate("入力ストリームに接続します。"); 
 
             ProcessManager pm = ProcessManager.Instance;
+            pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_PROCESS;
 
             // init
             this.button_exec.Enabled = false;
@@ -104,6 +105,7 @@ namespace S2MMSH
                             pm.process.SynchronizingObject = this;
                             //イベントハンドラの追加
                             pm.process.Exited += new EventHandler(p_Exited);
+                            pm.process.ErrorDataReceived += PrintErrorData;
                             //pm.process.ErrorDataReceived += new DataReceivedEventHandler(NetErrorDataHandler);
                             //プロセスが終了したときに Exited イベントを発生させる
                             pm.process.EnableRaisingEvents = true;
@@ -126,7 +128,7 @@ namespace S2MMSH
                                "mmsh://");
                             if (this.radioButton_reencode_1.Checked == false)
                             {
-                                startInfo.Arguments = String.Format(" -v quiet -i {0} -c copy -f asf_stream -", url);
+                                startInfo.Arguments = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
                             }
                             else {
                                 int width = 0;
@@ -145,7 +147,7 @@ namespace S2MMSH
                                 catch (Exception)
                                 {
                                     logoutput("エンコード設定が不正です。再エンコードしません。");
-                                    startInfo.Arguments = String.Format(" -v quiet -i {0} -c copy -f asf_stream -", url);
+                                    startInfo.Arguments = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
                                 }
                                 string strsize = String.Format("{0}x{1}", width, height);
                                 if (width == 0 || height == 0) strsize = "320x240";
@@ -154,7 +156,7 @@ namespace S2MMSH
                                 if (framerate == 0) framerate = 15;
 
                                 startInfo.Arguments = String.Format(
-                                    " -v quiet -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -", 
+                                    " -v error -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -", 
                                     url,
                                     bitrate_a,
                                     bitrate_v,
@@ -167,13 +169,15 @@ namespace S2MMSH
                             //startInfo.Arguments = " -v quiet -i mmsh://218.228.167.141:8888 -c copy -f asf_stream -";
                             startInfo.CreateNoWindow = true; startInfo.CreateNoWindow = true;
                             startInfo.RedirectStandardOutput = true;
-                            //startInfo.RedirectStandardError = true;
+                            startInfo.RedirectStandardError = true; // 標準エラー
                             startInfo.UseShellExecute = false;
 
                             Console.WriteLine(startInfo.Arguments);
 
                             pm.process.StartInfo = startInfo;
                             pm.process.Start();
+
+                            pm.process.BeginErrorReadLine();
 
                             int c = 0;
                             const int nBytes = 65535;
@@ -339,6 +343,9 @@ namespace S2MMSH
 
                             }
                         }
+                        catch (ThreadAbortException tex) {
+                            //無視
+                        }
                         catch (Exception exx){
                             MessageBox.Show(exx.Message,
         "エラー",
@@ -359,10 +366,58 @@ namespace S2MMSH
 
         private void p_Exited(object sender, EventArgs e)
         {
+            ProcessManager pm = ProcessManager.Instance;
             //プロセスが終了したときに実行される
             logoutput("ffmpegが終了しました。");
+
+            if (pm.ffmpegstatus == FFMPEG_STATUS.FFMPEG_STATUS_PROCESS) // 初期化
+            {
+                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZING;
+                this.button_disconnect.Enabled = false;
+                if (pm.process != null)
+                {
+                    pm.process.Dispose();
+                    pm.process = null;
+                }
+
+                if (pm.th_server != null)
+                {
+                    pm.server.Close();
+                    if (pm.th_server.IsAlive)
+                        pm.th_server.Abort();
+                    pm.th_server = null;
+                }
+
+                if (pm.th_ffmpeg != null)
+                {
+                    if (pm.th_ffmpeg.IsAlive)
+                        pm.th_ffmpeg.Abort();
+                    pm.th_ffmpeg = null;
+                }
+
+                // 初期化
+                AsfData asfData = AsfData.Instance;
+                asfData.asf_status = ASF_STATUS.ASF_STATUS_NULL;
+                asfData.asf_header_size = 0;
+                asfData.asf_header = new byte[65535];
+                asfData.mms_sock = null;
+                asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
+
+                this.button_exec.Enabled = true;
+
+                logoutput("接続を初期化しました。");
+
+                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZED;
+            }
         }
 
+        private void PrintErrorData(object sender, DataReceivedEventArgs e)
+        {
+            Process p = (Process)sender;
+
+            if (!string.IsNullOrEmpty(e.Data))
+                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput(e.Data); }), new object[] { "" }); ;
+        }
         private static void NetErrorDataHandler(object sendingProcess,
            DataReceivedEventArgs errLine)
         {
@@ -416,11 +471,13 @@ namespace S2MMSH
         {
             // スレッド・プロセス終了
             ProcessManager pm = ProcessManager.Instance;
+
             if (pm.process != null)
             {
                 if (!pm.process.HasExited)
                 {
                     pm.process.CancelOutputRead();
+                    pm.process.CancelErrorRead();
                     pm.process.Kill();
                     pm.process.WaitForExit();
                 }
@@ -460,53 +517,64 @@ namespace S2MMSH
 
         private void button_disconnect_Click(object sender, EventArgs e)
         {
-            logoutput("接続を初期化します。"); 
-            this.button_disconnect.Enabled = false;
             ProcessManager pm = ProcessManager.Instance;
-            
-
-            // スレッド・プロセス終了
-            if (pm.process != null)
+            if (pm.ffmpegstatus == FFMPEG_STATUS.FFMPEG_STATUS_PROCESS) // 初期化
             {
-                if (!pm.process.HasExited)
+                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZING;
+                logoutput("接続を初期化します。");
+                this.button_disconnect.Enabled = false;
+
+                // スレッド・プロセス終了
+                if (pm.process != null)
                 {
-                    try
+                    if (!pm.process.HasExited)
                     {
-                        pm.process.CancelOutputRead();
+                        try
+                        {
+                            //pm.process.CancelOutputRead();
+                            pm.process.CancelErrorRead();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Write(ex.Message);
+                        }
+                        pm.process.Kill();
                     }
-                    catch { }
-                    pm.process.Kill();
-                    pm.process.WaitForExit();
+
+                    pm.process = null;
+                }
+                if (pm.th_server != null)
+                {
+                    pm.server.Close();
+                    if (pm.th_server.IsAlive)
+                        pm.th_server.Abort();
+                    pm.th_server = null;
                 }
 
-                pm.process = null;
+                if (pm.th_ffmpeg != null)
+                {
+                    if (pm.th_ffmpeg.IsAlive)
+                        pm.th_ffmpeg.Abort();
+                    pm.th_ffmpeg = null;
+                }
+
+                // 初期化
+                AsfData asfData = AsfData.Instance;
+                asfData.asf_status = ASF_STATUS.ASF_STATUS_NULL;
+                asfData.asf_header_size = 0;
+                asfData.asf_header = new byte[65535];
+                asfData.mms_sock = null;
+                asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
+
+                this.button_exec.Enabled = true;
+
+                logoutput("接続を初期化しました。");
+
+                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZED;
             }
-            if (pm.th_server != null)
-            {
-                pm.server.Close();
-                if(pm.th_server.IsAlive)
-                pm.th_server.Abort();
-                pm.th_server = null;
+            else {
+                logoutput("接続は初期化中です。");
             }
-
-            if (pm.th_ffmpeg != null)
-            {
-                if(pm.th_ffmpeg.IsAlive)
-                pm.th_ffmpeg.Abort();
-                pm.th_ffmpeg = null;
-            }
-
-            // 初期化
-            AsfData asfData = AsfData.Instance;
-            asfData.asf_status = ASF_STATUS.ASF_STATUS_NULL;
-            asfData.asf_header_size = 0;
-            asfData.asf_header = new byte[65535];
-            asfData.mms_sock = null;
-            asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
-
-            this.button_exec.Enabled = true;
-
-            logoutput("接続を初期化しました。"); 
         }
 
         private void textBox_log_TextChanged(object sender, EventArgs e)

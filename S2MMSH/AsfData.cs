@@ -25,6 +25,14 @@ namespace S2MMSH
         MMSH_STATUS_ASF_DATA_SENDING
     };
 
+    public enum FFMPEG_STATUS
+    {
+        FFMPEG_STATUS_NULL,               // 初期状態
+        FFMPEG_STATUS_INITIALIZED,        // 初期化済
+        FFMPEG_STATUS_INITIALIZING,        // 初期化中
+        FFMPEG_STATUS_PROCESS              // 処理中
+    };
+
     public sealed class AsfData
     {
         private static AsfData m_Instance = new AsfData();
@@ -62,6 +70,7 @@ namespace S2MMSH
         public Thread th_ffmpeg = null;
         public Boolean serverstatus = true;
         public Socket server = null;
+        public FFMPEG_STATUS ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_NULL;
 
         private ProcessManager()
         {

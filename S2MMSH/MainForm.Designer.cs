@@ -209,9 +209,13 @@
             // 
             // textBox_log
             // 
+            this.textBox_log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_log.Location = new System.Drawing.Point(14, 341);
             this.textBox_log.Multiline = true;
             this.textBox_log.Name = "textBox_log";
+            this.textBox_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox_log.Size = new System.Drawing.Size(448, 81);
             this.textBox_log.TabIndex = 17;
             this.textBox_log.TextChanged += new System.EventHandler(this.textBox_log_TextChanged);
