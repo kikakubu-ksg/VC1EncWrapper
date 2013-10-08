@@ -8,6 +8,9 @@ S2MMSH
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kikakubu-ksg/s2mmsh/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
+##Update
+2013/10/08 ffmpegのエラーをログに出力するようにした。  
+
 ##What is this  
 ffmpegで認識可能なストリーミングデータについて、何実でライブ配信可能なmmsh形式に変換するツール  
 入力元はFFMPEGランチャーやMMSストリームなど。  
@@ -31,7 +34,7 @@ RTSP、RTMP等、ffmpegが対応しているプロトコルについては変換
 ##Issues  
 各鏡ツールとプレイヤーへの対応。（クライアントによって投げてくるhttpヘッダがまちまちなのよ）  
 RTMPサーバ化  
-$C（Change Notification）対応  ⇒鏡が対応してないので無理
+$C（Change Notification）対応  ⇒鏡が対応してないので無理  
 バックグラウンドストリーム（キャンバスストリーム）対応  
 プレイリスト対応  
 音声ストリーム追加（副音声追加）対応  
