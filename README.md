@@ -31,6 +31,17 @@ RTSP、RTMP等、ffmpegが対応しているプロトコルについては変換
 再生されやすさは、ffplay >>>>> VLC >>>>> GOM >>>WMPくらい  
 再変換を行った場合はほぼ再生可能。  
 
+[TIPS：ustreamをソースに使う場合]  
+直修モードでこんな感じ。なんでこれでいけるのかは謎ですが（処理はrtmpdumpと同様っぽい）  
+ -v error -i "rtmp://flash10.ustream.tv/ustreamVideo/11865965/ playpath=streams/live swfUrl=http://static-cdn1.ustream.tv/swf/live/viewer.rsl:96.swf swfVfy=1 live=1" -c copy -f asf_stream -  
+「rtmp://flash10.ustream.tv/ustreamVideo/11865965/」の部分だけamfファイルから拾ってくる。  
+・簡単な説明。詳細はググれ  
+１．ustreamの配信urlのソースからcidを拾う  
+２．http://cdngw.ustream.tv/Viewer/getStream/1/cid（←ここに入れる）.amfのファイルを取得  
+３．amfファイルの中に「rtmp://flashXX.ustream.tv/ustreamVideo/（cid）」みたいなのがある  
+※ケツにスラッシュいれないとダメぽいです。  
+※ていうかユーストはこんなめんどいことしなくてもGOM用アドレスあったよなそういや  
+
 
 ##Issues  
 各鏡ツールとプレイヤーへの対応。（クライアントによって投げてくるhttpヘッダがまちまちなのよ）  
