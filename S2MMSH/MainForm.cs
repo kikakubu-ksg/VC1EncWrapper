@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace S2MMSH
 {
@@ -59,6 +60,12 @@ namespace S2MMSH
             this.textBox_enc_framerate.Text = Properties.Settings.Default.enc_framerate;
 
             this.textBox_ffmpegcom.Text = Properties.Settings.Default.ffmpegcom;
+
+            this.tbx_Title.Text = Properties.Settings.Default.content_title;
+            this.tbx_Auther.Text = Properties.Settings.Default.content_auther;
+            this.tbx_Copyright.Text = Properties.Settings.Default.content_copyright;
+            this.tbx_Description.Text = Properties.Settings.Default.content_description;
+            this.tbx_Rating.Text = Properties.Settings.Default.content_rating;
 
             logoutputDelegate = new LogoutputDelegate(logoutput);
             connectButtonStateDeligate = new ConnectButtonDelegate(connectButtonState);
@@ -224,7 +231,7 @@ namespace S2MMSH
                                 {
                                     if (buf[0] == '$')
                                     {
-                                        c = buf[2] + (buf[3] << 8);
+                                        c = buf[2] + (buf[3] << 8); //ヘッダサイズ
                                         if (br.Read(buf, 4, c) != c)
                                         {
                                             break;
@@ -255,6 +262,7 @@ namespace S2MMSH
                                         if (bitrate == 0) bitrate = 256000;
                                         if (audiorate == 0) audiorate = 128000;
 
+                                        // Stream Bitrate Properties Object
                                         byte[] bitrate_property =
                                             new byte[]{
         0xCE, 0x75, 0xF8, 0x7B, 0x8D, 0x46, 0xD1, 0x11,
@@ -276,6 +284,7 @@ namespace S2MMSH
                                     };
 
                                         // existence check
+                                        // 既に登録されてるかどうかの確認！
                                         int j, k;
                                         int y;
                                         Boolean pflg = true;
@@ -319,13 +328,169 @@ namespace S2MMSH
                                             buf[10] = buf[2];
                                             buf[11] = buf[3];
                                             buf[36] = (byte)(buf[36] + 1);
+                                            c = c + 38;
                                         }
+
+                                        // Content Description Object用
+                                        // DescriptionのLengthをとってオブジェクトを作成する。
+                                        // サイズを取得する
+                                        byte[] title = Encoding.GetEncoding("UTF-16LE").GetBytes(this.tbx_Title.Text);
+                                        byte[] auther = Encoding.GetEncoding("UTF-16LE").GetBytes(this.tbx_Auther.Text);
+                                        byte[] copyright = Encoding.GetEncoding("UTF-16LE").GetBytes(this.tbx_Copyright.Text);
+                                        byte[] description = Encoding.GetEncoding("UTF-16LE").GetBytes(this.tbx_Description.Text);
+                                        byte[] rating = Encoding.GetEncoding("UTF-16LE").GetBytes(this.tbx_Rating.Text);
+
+                                        int Title_length = title.Length;
+                                        int Auther_length = auther.Length;
+                                        int Copyright_length = copyright.Length;
+                                        int Description_length = description.Length;
+                                        int Rating_length = rating.Length;
+
+                                        int content_description_object_size = 34 + Title_length + Auther_length + Copyright_length + Description_length + Rating_length;
+
+                                        // Content Description Object
+                                        byte[] content_description_object =
+                                            new byte[]{
+        0x33, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11,
+        0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C,
+        (byte)((content_description_object_size >> (8 * 0)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 1)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 2)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 3)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 4)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 5)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 6)) & 0xFF),
+        (byte)((content_description_object_size >> (8 * 7)) & 0xFF),
+        (byte)((Title_length >> (8 * 0)) & 0xFF),
+        (byte)((Title_length >> (8 * 1)) & 0xFF),
+        (byte)((Auther_length >> (8 * 0)) & 0xFF),
+        (byte)((Auther_length >> (8 * 1)) & 0xFF),
+        (byte)((Copyright_length >> (8 * 0)) & 0xFF),
+        (byte)((Copyright_length >> (8 * 1)) & 0xFF),
+        (byte)((Description_length >> (8 * 0)) & 0xFF),
+        (byte)((Description_length >> (8 * 1)) & 0xFF),
+        (byte)((Rating_length >> (8 * 0)) & 0xFF),
+        (byte)((Rating_length >> (8 * 1)) & 0xFF)
+                                    };
+                                        
+                                       
+                                        System.Collections.Generic.List<byte>
+    mergedList = new System.Collections.Generic.List<byte>(content_description_object_size);
+
+                                        mergedList.AddRange(content_description_object);
+                                        mergedList.AddRange(title);
+                                        mergedList.AddRange(auther);
+                                        mergedList.AddRange(copyright);
+                                        mergedList.AddRange(description);
+                                        mergedList.AddRange(rating);
+
+                                        content_description_object = mergedList.ToArray();
+
+                                        // existence check
+                                        // 既に登録されてるかどうかの確認！
+                                        
+                                        Boolean pflg2 = true;
+                                        for (j = 0; j < c; j++)
+                                        {
+                                            y = 0;
+                                            for (k = 0; k < 16; k++)
+                                            {
+                                                if (content_description_object[k] == buf[j + k])
+                                                {
+                                                    y++;
+                                                }
+                                                else { break; }
+                                            }
+                                            if (y == 16)
+                                            {
+                                                pflg2 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if (pflg2)
+                                        {
+                                            byte[] data50 = new byte[50];
+                                            int i;
+                                            for (i = 0; i < 50; i++)
+                                            {
+                                                data50[i] = buf[c + 4 - 50 + i];
+                                            }
+                                            for (i = 0; i < content_description_object_size; i++)
+                                            {
+                                                buf[c + 4 - 50 + i] = content_description_object[i];
+                                            }
+                                            for (i = 0; i < 50; i++)
+                                            {
+                                                buf[c + 4 - 50 + content_description_object_size + i] = data50[i];
+                                            }
+
+                                            buf[2] = (byte)(c + content_description_object_size);
+                                            buf[3] = (byte)((c + content_description_object_size) >> 8);
+                                            buf[10] = buf[2];
+                                            buf[11] = buf[3];
+                                            buf[36] = (byte)(buf[36] + 1);
+                                            c = c + content_description_object_size;
+                                        }
+
+                                        // File Properties Object にGUIDを設定する
+                                        // GUIDを生成
+                                        byte[] s2mmsh_guid = Guid.NewGuid().ToByteArray();
+
+                                        // グリニッジ標準の現在時刻
+                                        DateTime dtNow = DateTime.Now.ToUniversalTime();
+
+                                        // グリニッジ標準の開始時刻
+                                        DateTime dtEpoc = new DateTime(1601, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+                                        // グリニッジ経過時刻を取得
+                                        TimeSpan tsEpoc = dtNow.Subtract(dtEpoc);
+
+                                        Int64 tm = Convert.ToInt64(tsEpoc.TotalMilliseconds * 10000); // 100ナノ秒
+                                        //Int64 tm = 1;
+                                        byte[] starttime = BitConverter.GetBytes(tm);
+　　
+                                        // File Properties Object
+                                        byte[] file_properties_object =
+                                            new byte[]{
+        0xA1, 0xDC, 0xAB, 0x8C, 0x47, 0xA9, 0xCF, 0x11,
+        0x8E, 0xE4, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65
+                                            };
+
+                                        // オブジェクトの場所を見つける
+                                        for (j = 0; j < c; j++)
+                                        {
+                                            y = 0;
+                                            for (k = 0; k < 16; k++)
+                                            {
+                                                if (file_properties_object[k] == buf[j + k])
+                                                {
+                                                    y++;
+                                                }
+                                                else { break; }
+                                            }
+                                            if (y == 16)
+                                            {
+                                                //pflg2 = false;
+                                                for (int m = 0; m < 16; m++)
+                                                {
+                                                    buf[j + 24 + m] = s2mmsh_guid[m];
+                                                }
+                                                for (int n = 0; n < 8; n++)
+                                                {
+                                                    buf[j + 48 + n] = starttime[n];
+                                                }
+
+                                                break;
+                                            }
+                                        }
+
 
                                         buf.CopyTo(asfData.asf_header, 0);
                                         Console.WriteLine("ASF header registered.");
                                         this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("ASFヘッダを登録しました。"); }), new object[] { "" });
                                         if (pm.serverstatus) this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("クライアント接続を受け付けます。"); }), new object[] { "" });
-                                        asfData.asf_header_size = c + 4 + 38;
+                                        asfData.asf_header_size = c + 4; //todo ここも追加する
                                         //asfData.asf_header_size = c + 4;
                                         asfData.asf_status = ASF_STATUS.ASF_STATUS_SET_HEADER;
 
@@ -558,6 +723,12 @@ namespace S2MMSH
 
             Properties.Settings.Default.ffmpegcom_flag = radioButton_ffmpegcom_1.Checked;
             Properties.Settings.Default.ffmpegcom = this.textBox_ffmpegcom.Text;
+
+            Properties.Settings.Default.content_title = this.tbx_Title.Text;
+            Properties.Settings.Default.content_auther = this.tbx_Auther.Text;
+            Properties.Settings.Default.content_copyright = this.tbx_Copyright.Text;
+            Properties.Settings.Default.content_description = this.tbx_Description.Text;
+            Properties.Settings.Default.content_rating = this.tbx_Rating.Text;
 
             Properties.Settings.Default.Save();
             

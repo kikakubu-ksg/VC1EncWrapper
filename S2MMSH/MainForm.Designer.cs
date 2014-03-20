@@ -75,6 +75,17 @@
             this.radioButton_ffmpegcom_2 = new System.Windows.Forms.RadioButton();
             this.label20 = new System.Windows.Forms.Label();
             this.radioButton_ffmpegcom_1 = new System.Windows.Forms.RadioButton();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tbx_Rating = new System.Windows.Forms.TextBox();
+            this.l_Rating = new System.Windows.Forms.Label();
+            this.tbx_Description = new System.Windows.Forms.TextBox();
+            this.l_Description = new System.Windows.Forms.Label();
+            this.tbx_Copyright = new System.Windows.Forms.TextBox();
+            this.l_Copyright = new System.Windows.Forms.Label();
+            this.tbx_Auther = new System.Windows.Forms.TextBox();
+            this.l_Auther = new System.Windows.Forms.Label();
+            this.tbx_Title = new System.Windows.Forms.TextBox();
+            this.l_Title = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.label_version = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
@@ -83,6 +94,7 @@
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -443,8 +455,9 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Location = new System.Drawing.Point(3, 3);
+            this.tabControl1.Location = new System.Drawing.Point(7, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(471, 290);
@@ -552,6 +565,111 @@
             this.radioButton_ffmpegcom_1.UseVisualStyleBackColor = true;
             this.radioButton_ffmpegcom_1.CheckedChanged += new System.EventHandler(this.radioButton_ffmpegcom_1_CheckedChanged);
             // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.tbx_Rating);
+            this.tabPage4.Controls.Add(this.l_Rating);
+            this.tabPage4.Controls.Add(this.tbx_Description);
+            this.tabPage4.Controls.Add(this.l_Description);
+            this.tabPage4.Controls.Add(this.tbx_Copyright);
+            this.tabPage4.Controls.Add(this.l_Copyright);
+            this.tabPage4.Controls.Add(this.tbx_Auther);
+            this.tabPage4.Controls.Add(this.l_Auther);
+            this.tabPage4.Controls.Add(this.tbx_Title);
+            this.tabPage4.Controls.Add(this.l_Title);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(463, 264);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "配信内容";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // tbx_Rating
+            // 
+            this.tbx_Rating.Location = new System.Drawing.Point(106, 171);
+            this.tbx_Rating.Name = "tbx_Rating";
+            this.tbx_Rating.Size = new System.Drawing.Size(326, 19);
+            this.tbx_Rating.TabIndex = 9;
+            // 
+            // l_Rating
+            // 
+            this.l_Rating.AutoSize = true;
+            this.l_Rating.Font = new System.Drawing.Font("MS UI Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.l_Rating.Location = new System.Drawing.Point(18, 171);
+            this.l_Rating.Name = "l_Rating";
+            this.l_Rating.Size = new System.Drawing.Size(78, 15);
+            this.l_Rating.TabIndex = 8;
+            this.l_Rating.Text = "レーティング";
+            // 
+            // tbx_Description
+            // 
+            this.tbx_Description.Location = new System.Drawing.Point(106, 133);
+            this.tbx_Description.Name = "tbx_Description";
+            this.tbx_Description.Size = new System.Drawing.Size(326, 19);
+            this.tbx_Description.TabIndex = 7;
+            // 
+            // l_Description
+            // 
+            this.l_Description.AutoSize = true;
+            this.l_Description.Font = new System.Drawing.Font("MS UI Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.l_Description.Location = new System.Drawing.Point(18, 133);
+            this.l_Description.Name = "l_Description";
+            this.l_Description.Size = new System.Drawing.Size(39, 15);
+            this.l_Description.TabIndex = 6;
+            this.l_Description.Text = "詳細";
+            // 
+            // tbx_Copyright
+            // 
+            this.tbx_Copyright.Location = new System.Drawing.Point(106, 91);
+            this.tbx_Copyright.Name = "tbx_Copyright";
+            this.tbx_Copyright.Size = new System.Drawing.Size(326, 19);
+            this.tbx_Copyright.TabIndex = 5;
+            // 
+            // l_Copyright
+            // 
+            this.l_Copyright.AutoSize = true;
+            this.l_Copyright.Font = new System.Drawing.Font("MS UI Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.l_Copyright.Location = new System.Drawing.Point(18, 95);
+            this.l_Copyright.Name = "l_Copyright";
+            this.l_Copyright.Size = new System.Drawing.Size(55, 15);
+            this.l_Copyright.TabIndex = 4;
+            this.l_Copyright.Text = "著作権";
+            // 
+            // tbx_Auther
+            // 
+            this.tbx_Auther.Location = new System.Drawing.Point(106, 53);
+            this.tbx_Auther.Name = "tbx_Auther";
+            this.tbx_Auther.Size = new System.Drawing.Size(326, 19);
+            this.tbx_Auther.TabIndex = 3;
+            // 
+            // l_Auther
+            // 
+            this.l_Auther.AutoSize = true;
+            this.l_Auther.Font = new System.Drawing.Font("MS UI Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.l_Auther.Location = new System.Drawing.Point(18, 57);
+            this.l_Auther.Name = "l_Auther";
+            this.l_Auther.Size = new System.Drawing.Size(55, 15);
+            this.l_Auther.TabIndex = 2;
+            this.l_Auther.Text = "配信者";
+            // 
+            // tbx_Title
+            // 
+            this.tbx_Title.Location = new System.Drawing.Point(106, 15);
+            this.tbx_Title.Name = "tbx_Title";
+            this.tbx_Title.Size = new System.Drawing.Size(326, 19);
+            this.tbx_Title.TabIndex = 1;
+            // 
+            // l_Title
+            // 
+            this.l_Title.AutoSize = true;
+            this.l_Title.Font = new System.Drawing.Font("MS UI Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.l_Title.Location = new System.Drawing.Point(18, 19);
+            this.l_Title.Name = "l_Title";
+            this.l_Title.Size = new System.Drawing.Size(55, 15);
+            this.l_Title.TabIndex = 0;
+            this.l_Title.Text = "タイトル";
+            // 
             // tabPage3
             // 
             this.tabPage3.Controls.Add(this.label_version);
@@ -566,7 +684,7 @@
             // label_version
             // 
             this.label_version.AutoSize = true;
-            this.label_version.Location = new System.Drawing.Point(26, 68);
+            this.label_version.Location = new System.Drawing.Point(19, 22);
             this.label_version.Name = "label_version";
             this.label_version.Size = new System.Drawing.Size(41, 12);
             this.label_version.TabIndex = 0;
@@ -597,6 +715,8 @@
             this.tabPage2.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.ResumeLayout(false);
@@ -655,6 +775,17 @@
         private System.Windows.Forms.TextBox textBox_ffmpegcom;
         private System.Windows.Forms.Button button_current_command;
         private System.Windows.Forms.Label label_version;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TextBox tbx_Rating;
+        private System.Windows.Forms.Label l_Rating;
+        private System.Windows.Forms.TextBox tbx_Description;
+        private System.Windows.Forms.Label l_Description;
+        private System.Windows.Forms.TextBox tbx_Copyright;
+        private System.Windows.Forms.Label l_Copyright;
+        private System.Windows.Forms.TextBox tbx_Auther;
+        private System.Windows.Forms.Label l_Auther;
+        private System.Windows.Forms.TextBox tbx_Title;
+        private System.Windows.Forms.Label l_Title;
     }
 }
 
