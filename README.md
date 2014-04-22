@@ -9,6 +9,7 @@ S2MMSH
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kikakubu-ksg/s2mmsh/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 ##Update
+2014/04/18 ASFの詳細タグを入れられるようにした。裏ではGUIDも自動挿入してます。
 2013/10/08 ffmpegのコマンドを直修できるようにした。  
 2013/10/08 ffmpegのエラーをログに出力するようにした。  
 
@@ -41,6 +42,9 @@ RTSP、RTMP等、ffmpegが対応しているプロトコルについては変換
 ３．amfファイルの中に「rtmp://flashXX.ustream.tv/ustreamVideo/（cid）」みたいなのがある  
 ※ケツにスラッシュいれないとダメぽいです。  
 ※ていうかユーストはこんなめんどいことしなくてもGOM用アドレスあったよなそういや  
+  
+[サンプルコマンド]  
+準備中  
 
 ##Memo  
 [簡易キャプチャー機構作成についてのメモ]  
