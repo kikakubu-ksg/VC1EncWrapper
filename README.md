@@ -9,7 +9,7 @@ S2MMSH
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kikakubu-ksg/s2mmsh/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 ##Update
-2014/04/18 ASFの詳細タグを入れられるようにした。裏ではGUIDも自動挿入してます。
+2014/04/18 ASFの詳細タグを入れられるようにした。裏ではGUIDも自動挿入してます。  
 2013/10/08 ffmpegのコマンドを直修できるようにした。  
 2013/10/08 ffmpegのエラーをログに出力するようにした。  
 
@@ -17,11 +17,13 @@ S2MMSH
 ffmpegで認識可能なストリーミングデータについて、何実でライブ配信可能なmmsh形式に変換するツール  
 入力元はFFMPEGランチャーやMMSストリームなど。  
 注）現バージョンはKagamin2最新バージョンからのアクセスのみサポートしています。  
+注）エンコード形式がH264の場合はWMPでは見れません。qasf.dllを使わない独自コーデックなプレイヤーなら大丈夫。  
 
 ##How to use  
 [入力にFFMPEGランチャーを使う場合]  
 FFMPEGランチャーの出力にはtcp://IP:ポート?listenを使用。  
 S2MMSHの入力ストリームにtcp://IP:ポートを指定し、平均ビットレートにはFFMPEGランチャーで指定した値を使用（おまじない）  
+コマンドをS2MMSHに直接貼り付ければFFMPEGランチャー起動する必要はないですぞ。  
 
 [入力にMMSソースを使う場合]  
 プロトコルはmmsh://に書き換える。 （http://とmms://は自動的に置き換えられる。）
@@ -45,6 +47,7 @@ RTSP、RTMP等、ffmpegが対応しているプロトコルについては変換
   
 [サンプルコマンド]  
 準備中  
+S2MMSH単体で  
 
 ##Memo  
 [簡易キャプチャー機構作成についてのメモ]  
