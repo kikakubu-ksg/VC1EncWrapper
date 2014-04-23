@@ -46,8 +46,10 @@ RTSP、RTMP等、ffmpegが対応しているプロトコルについては変換
 ※ていうかユーストはこんなめんどいことしなくてもGOM用アドレスあったよなそういや  
   
 [サンプルコマンド]  
-準備中  
-S2MMSH単体で  
+S2MMSH単体で高品質エンコードする場合のサンプルとか。参考にしてください。  
+-v quiet -rtbufsize 10MB -r 60 -s 512x770 -f dshow -i video="SCFF DirectShow Filter":audio="ステレオ ミキサー (Realtek High Definit"  
+-threads 4 -r 60 -s 512x770 -sws_flags lanczos -pix_fmt yuv420p -maxrate 512k -bufsize 256k -crf 23.0 -vcodec libx264 -preset medium  
+-profile:v high -acodec libfdk_aac -ar 44100 -ab 64k -ac 2 -vol 256 -f asf_stream -   
 
 ##Memo  
 [簡易キャプチャー機構作成についてのメモ]  
