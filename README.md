@@ -36,20 +36,21 @@ RTSP、RTMP等、ffmpegが対応しているプロトコルについては変換
 
 [TIPS：ustreamをソースに使う場合]  
 直修モードでこんな感じ。なんでこれでいけるのかは謎ですが（処理はrtmpdumpと同様っぽい）  
- -v error -i "rtmp://flash10.ustream.tv/ustreamVideo/11865965/ playpath=streams/live swfUrl=http://static-cdn1.ustream.tv/swf/live/viewer.rsl:96.swf swfVfy=1 live=1" -c copy -f asf_stream -  
+` -v error -i "rtmp://flash10.ustream.tv/ustreamVideo/11865965/ playpath=streams/live swfUrl=http://static-cdn1.ustream.tv/swf/live/viewer.rsl:96.swf swfVfy=1 live=1" -c copy -f asf_stream -  `
+
 「rtmp://flash10.ustream.tv/ustreamVideo/11865965/」の部分だけamfファイルから拾ってくる。  
-・簡単な説明。詳細はググれ  
-１．ustreamの配信urlのソースからcidを拾う  
-２．http://cdngw.ustream.tv/Viewer/getStream/1/cid（←ここに入れる）.amfのファイルを取得  
-３．amfファイルの中に「rtmp://flashXX.ustream.tv/ustreamVideo/（cid）」みたいなのがある  
+
+簡単な説明。詳細はググれ  
+1. ustreamの配信urlのソースからcidを拾う  
+2. http://cdngw.ustream.tv/Viewer/getStream/1/cid（←ここに入れる）.amfのファイルを取得  
+3. amfファイルの中に「rtmp://flashXX.ustream.tv/ustreamVideo/（cid）」みたいなのがある  
+
 ※ケツにスラッシュいれないとダメぽいです。  
 ※ていうかユーストはこんなめんどいことしなくてもGOM用アドレスあったよなそういや  
   
 [サンプルコマンド]  
 S2MMSH単体で高品質エンコードする場合のサンプルとか。参考にしてください。  
--v quiet -rtbufsize 10MB -r 60 -s 512x770 -f dshow -i video="SCFF DirectShow Filter":audio="ステレオ ミキサー (Realtek High Definit"  
--threads 4 -r 60 -s 512x770 -sws_flags lanczos -pix_fmt yuv420p -maxrate 512k -bufsize 256k -crf 23.0 -vcodec libx264 -preset medium  
--profile:v high -acodec libfdk_aac -ar 44100 -ab 64k -ac 2 -vol 256 -f asf_stream -   
+`-v quiet -rtbufsize 10MB -r 60 -s 512x770 -f dshow -i video="SCFF DirectShow Filter":audio="ステレオ ミキサー (Realtek High Definit" -threads 4 -r 60 -s 512x770 -sws_flags lanczos -pix_fmt yuv420p -maxrate 512k -bufsize 256k -crf 23.0 -vcodec libx264 -preset medium -profile:v high -acodec libfdk_aac -ar 44100 -ab 64k -ac 2 -vol 256 -f asf_stream - `  
 
 ##Memo  
 [簡易キャプチャー機構作成についてのメモ]  
