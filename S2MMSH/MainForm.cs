@@ -109,6 +109,49 @@ namespace S2MMSH
         // connection
         private void button_exec_Click(object sender, EventArgs e)
         {
+            Button btn = sender as Button;
+            Boolean push_mode = false;
+            if (btn.Name.Equals("button_exec_push"))
+            {
+                push_mode = true;
+            }
+
+            // 設定チェック
+            if (push_mode) 
+            {
+                // アドレスチェック (おさしみ標準スタイル)
+                if (!System.Text.RegularExpressions.Regex.IsMatch(
+                    textBox_pushAddr.Text,
+                    @"^[-a-zA-Z_0-9]+\.[-a-zA-Z_0-9\.]+:[0-9]{1,5}$",
+                    System.Text.RegularExpressions.RegexOptions.ECMAScript))
+                {
+                    logoutputDelegate("PUSH先アドレスが不正です。");
+                    return;
+                }
+            }
+            else 
+            { 
+                // ポートチェック
+                if(this.textBox_exPort.Text == "")
+                {
+                    logoutputDelegate("配信ポートが未入力です。");
+                    return;
+                }
+                try
+                {
+                    int test = int.Parse(this.textBox_exPort.Text);
+                    if (test > 65535 || test < 0)
+                    {
+                        logoutputDelegate("配信ポートが不正です。");
+                        return;
+                    }
+                }
+                catch {
+                    logoutputDelegate("配信ポートが不正です。");
+                    return;
+                }
+            }
+
             //this.textBox_log.AppendText("入力ストリームに接続します。\r\n");
             logoutputDelegate("入力ストリームに接続します。"); 
 
@@ -117,12 +160,16 @@ namespace S2MMSH
 
             // init
             this.button_exec.Enabled = false;
+            this.button_exec_push.Enabled = false;
 
-            // httpserver listening
-            pm.th_server = new Thread(
-                new ThreadStart(HttpThread)
-            );
-            pm.th_server.Start(); 
+            if (!push_mode)
+            {
+                // httpserver listening
+                pm.th_server = new Thread(
+                    new ThreadStart(HttpThread)
+                );
+                pm.th_server.Start();
+            }
 
             // ffmpeg tcp stream receive process
             if (pm.process == null)
@@ -252,7 +299,7 @@ namespace S2MMSH
                                             bitrate = int.Parse(this.textBox_videorate.Text) * 1000;
                                             audiorate = int.Parse(this.textBox_audiorate.Text) * 1000;
                                         }
-                                        catch (Exception ex)
+                                        catch (Exception)
                                         {
                                             //this.textBox_log.AppendText(ex.Message);
                                             //break;
@@ -265,23 +312,23 @@ namespace S2MMSH
                                         // Stream Bitrate Properties Object
                                         byte[] bitrate_property =
                                             new byte[]{
-        0xCE, 0x75, 0xF8, 0x7B, 0x8D, 0x46, 0xD1, 0x11,
-        0x8D, 0x82, 0x00, 0x60, 0x97, 0xC9, 0xA2, 0xB2,
-        0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x02, 0x00, //Bitrate Records Count
-        // video bitrate
-        0x01, 0x00, 
-        (byte)bitrate, 
-        (byte)((bitrate >> 8) & 0xFF), 
-        (byte)((bitrate >> 16) & 0xFF), 
-        (byte)((bitrate >> 24) & 0xFF), 
-        // audio bitrate 12800bit/sec
-        0x02, 0x00, 
-        (byte)audiorate, 
-        (byte)((audiorate >> 8) & 0xFF), 
-        (byte)((audiorate >> 16) & 0xFF), 
-        (byte)((audiorate >> 24) & 0xFF)
-                                    };
+                                                0xCE, 0x75, 0xF8, 0x7B, 0x8D, 0x46, 0xD1, 0x11,
+                                                0x8D, 0x82, 0x00, 0x60, 0x97, 0xC9, 0xA2, 0xB2,
+                                                0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                0x02, 0x00, //Bitrate Records Count
+                                                // video bitrate
+                                                0x01, 0x00, 
+                                                (byte)bitrate, 
+                                                (byte)((bitrate >> 8) & 0xFF), 
+                                                (byte)((bitrate >> 16) & 0xFF), 
+                                                (byte)((bitrate >> 24) & 0xFF), 
+                                                // audio bitrate 12800bit/sec
+                                                0x02, 0x00, 
+                                                (byte)audiorate, 
+                                                (byte)((audiorate >> 8) & 0xFF), 
+                                                (byte)((audiorate >> 16) & 0xFF), 
+                                                (byte)((audiorate >> 24) & 0xFF)
+                                            };
 
                                         // existence check
                                         // 既に登録されてるかどうかの確認！
@@ -351,31 +398,31 @@ namespace S2MMSH
                                         // Content Description Object
                                         byte[] content_description_object =
                                             new byte[]{
-        0x33, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11,
-        0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C,
-        (byte)(((Int64)content_description_object_size >> (8 * 0)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 1)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 2)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 3)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 4)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 5)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 6)) & 0xFF),
-        (byte)(((Int64)content_description_object_size >> (8 * 7)) & 0xFF),
-        (byte)((Title_length >> (8 * 0)) & 0xFF),
-        (byte)((Title_length >> (8 * 1)) & 0xFF),
-        (byte)((Auther_length >> (8 * 0)) & 0xFF),
-        (byte)((Auther_length >> (8 * 1)) & 0xFF),
-        (byte)((Copyright_length >> (8 * 0)) & 0xFF),
-        (byte)((Copyright_length >> (8 * 1)) & 0xFF),
-        (byte)((Description_length >> (8 * 0)) & 0xFF),
-        (byte)((Description_length >> (8 * 1)) & 0xFF),
-        (byte)((Rating_length >> (8 * 0)) & 0xFF),
-        (byte)((Rating_length >> (8 * 1)) & 0xFF)
-                                    };
+                                                0x33, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11,
+                                                0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C,
+                                                (byte)(((Int64)content_description_object_size >> (8 * 0)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 1)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 2)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 3)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 4)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 5)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 6)) & 0xFF),
+                                                (byte)(((Int64)content_description_object_size >> (8 * 7)) & 0xFF),
+                                                (byte)((Title_length >> (8 * 0)) & 0xFF),
+                                                (byte)((Title_length >> (8 * 1)) & 0xFF),
+                                                (byte)((Auther_length >> (8 * 0)) & 0xFF),
+                                                (byte)((Auther_length >> (8 * 1)) & 0xFF),
+                                                (byte)((Copyright_length >> (8 * 0)) & 0xFF),
+                                                (byte)((Copyright_length >> (8 * 1)) & 0xFF),
+                                                (byte)((Description_length >> (8 * 0)) & 0xFF),
+                                                (byte)((Description_length >> (8 * 1)) & 0xFF),
+                                                (byte)((Rating_length >> (8 * 0)) & 0xFF),
+                                                (byte)((Rating_length >> (8 * 1)) & 0xFF)
+                                            };
                                         
                                        
-                                        System.Collections.Generic.List<byte>
-    mergedList = new System.Collections.Generic.List<byte>(content_description_object_size);
+                                        System.Collections.Generic.List<byte> mergedList = 
+                                            new System.Collections.Generic.List<byte>(content_description_object_size);
 
                                         mergedList.AddRange(content_description_object);
                                         mergedList.AddRange(title);
@@ -449,12 +496,12 @@ namespace S2MMSH
                                         Int64 tm = Convert.ToInt64(tsEpoc.TotalMilliseconds * 10000); // 100ナノ秒
                                         //Int64 tm = 1;
                                         byte[] starttime = BitConverter.GetBytes(tm);
-　　
+
                                         // File Properties Object
                                         byte[] file_properties_object =
                                             new byte[]{
-        0xA1, 0xDC, 0xAB, 0x8C, 0x47, 0xA9, 0xCF, 0x11,
-        0x8E, 0xE4, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65
+                                                0xA1, 0xDC, 0xAB, 0x8C, 0x47, 0xA9, 0xCF, 0x11,
+                                                0x8E, 0xE4, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65
                                             };
 
                                         // オブジェクトの場所を見つける
@@ -484,18 +531,134 @@ namespace S2MMSH
                                                 break;
                                             }
                                         }
-
-
+                                        if (push_mode)
+                                        {
+                                            asfData.asf_header_size = deleteMmsPreHeader(ref buf, c + 4);
+                                        }
+                                        else
+                                        {
+                                            asfData.asf_header_size = c + 4;
+                                        }
                                         buf.CopyTo(asfData.asf_header, 0);
                                         Console.WriteLine("ASF header registered.");
-                                        this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("ASFヘッダを登録しました。"); }), new object[] { "" });
-                                        if (pm.serverstatus) this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("クライアント接続を受け付けます。"); }), new object[] { "" });
-                                        asfData.asf_header_size = c + 4; //todo ここも追加する
-                                        //asfData.asf_header_size = c + 4;
                                         asfData.asf_status = ASF_STATUS.ASF_STATUS_SET_HEADER;
 
+                                        this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("ASFヘッダを登録しました。"); }), new object[] { "" });
+                                        if (push_mode)
+                                        {
+                                            this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("PUSH接続を開始します。"); }), new object[] { "" });
+                                            // PUSHサーバに接続
+                                            // クライアントソケット作成
+                                            // host:port取得
+                                            // サーバ接続
+                                            // Response読み取り
+                                            
+                                            
+
+                                            //サーバーのホスト名とポート番号
+                                            var r =
+                                                new System.Text.RegularExpressions.Regex(
+                                                     @"^([-a-zA-Z_0-9]+\.[-a-zA-Z_0-9\.]+):([0-9]{1,5})$");
+                                            var m = r.Match("textBox_pushAddr.Text");
+
+                                            string host = m.Groups[0].Value;
+                                            int port = int.Parse(m.Groups[1].Value);
+
+                                            IPHostEntry hostname = Dns.GetHostEntry(host);
+                                            IPEndPoint RHost = new IPEndPoint(hostname.AddressList[0], port);
+                                            Socket mClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                                            mClient.Connect(RHost);
+
+                                            String httpHeader = String.Format(
+                                                "POST / HTTP/1.1\r\n" +
+                                                "Content-Type: application/x-wms-pushsetup\r\n" +
+                                                "X-Accept-Authentication: NTLM, Digest\r\n" +
+                                                "User-Agent: WMEncoder/9.0.0.3287\r\n" +
+                                                "Host: " + host + ":" + port + "\r\n" +
+                                                "Content-Length: 0\r\n" +
+                                                "Connection: Keep-Alive\r\n" +
+                                                "Cache-Control: no-cache\r\n" +
+                                                "Cookie: push-id=0\r\n" +
+                                                "\r\n"
+                                                //, asfData.asf_header_size
+                                            );
+
+                                            byte[] httpHeaderBuffer = Encoding.UTF8.GetBytes(httpHeader);
+                                            mClient.Send(httpHeaderBuffer, SocketFlags.None);
+
+                                            byte[] buffer = new byte[(int)mClient.ReceiveBufferSize];
+
+                                            int recvLen = 0;
+                                            try
+                                            {
+                                                while (mClient.Available > 0)
+                                                {
+                                                    recvLen += mClient.Receive(buffer);
+                                                }
+                                            }
+                                            catch (SocketException ex)
+                                            {
+                                                Console.WriteLine("{0} Error code: {1}.", ex.Message, ex.ErrorCode);
+                                                throw ex;
+                                            }
+                                            String msg = "接続しました。";
+
+                                            try
+                                            {
+                                                msg = "接続しました。[" + mClient.RemoteEndPoint.ToString() + "]";
+                                            }
+                                            catch
+                                            {
+                                            }
+                                            this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput(msg); }), new object[] { "" });
+                                            String message = Encoding.ASCII.GetString(buffer, 0, recvLen);
+                                            Console.Write("httprequest:" + message);
+
+                                            if (message.Contains("HTTP/1.1 204"))
+                                            {
+                                                r =
+                                                new System.Text.RegularExpressions.Regex(
+                                                     @"^push-id=([0-9]+)$");
+                                                m = r.Match(message);
+                                                String pushid = m.Groups[0].Value;
+
+                                                httpHeader = String.Format(
+                                                    "POST / HTTP/1.1\r\n" +
+                                                    "Content-Type: application/x-wms-pushstart\r\n" +
+                                                    "X-Accept-Authentication: NTLM, Digest\r\n" +
+                                                    "User-Agent: WMEncoder/9.0.0.3287\r\n" +
+                                                    "Host: " + host + ":" + port + "\r\n" +
+                                                    "Content-Length: 2147483647\r\n" +
+                                                    "Connection: Keep-Alive\r\n" +
+                                                    "Cache-Control: no-cache\r\n" +
+                                                    "Cookie: push-id=" + pushid + "\r\n" +
+                                                    "\r\n"
+                                                );
+
+                                                // ヘッダ送信
+                                                httpHeaderBuffer = Encoding.UTF8.GetBytes(httpHeader);
+                                                mClient.Send(httpHeaderBuffer, SocketFlags.None);
+                                                mClient.Send(asfData.asf_header, asfData.asf_header_size, SocketFlags.None);
+                                                Console.WriteLine("ASF header sent.");
+                                                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("ASFヘッダを送信しました。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
+
+                                                // MMSソケット登録
+                                                asfData.mms_sock = mClient;
+                                                // ステータス更新
+                                                asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_HEADER_SEND;
+                                                
+                                            }
+                                            else
+                                            {
+                                                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("PUSHサーバとの接続に失敗しました。"); }), new object[] { "" });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (pm.serverstatus) this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("クライアント接続を受け付けます。"); }), new object[] { "" });
+                                        }
                                     }
-                                    else
+                                    else // Headerではない場合
                                         if (buf[1] == 'D' && (
                                         asfData.mmsh_status == MMSH_STATUS.MMSH_STATUS_ASF_HEADER_SEND
                                         || asfData.mmsh_status == MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING
@@ -505,11 +668,20 @@ namespace S2MMSH
                                             {
                                                 if (asfData.mms_sock != null)
                                                 {
-                                                    int a = asfData.mms_sock.Available;
-                                                    asfData.mms_sock.Send(buf, c + 4, SocketFlags.None);
-                                                    //Console.WriteLine("ASF Data sent.");
-                                                    asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
-                                                    a = asfData.mms_sock.Available;
+                                                    if (push_mode)
+                                                    {
+                                                        int size = deleteMmsPreHeader(ref buf, c + 4);
+                                                        asfData.mms_sock.Send(buf, size, SocketFlags.None);
+                                                        asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
+                                                    }
+                                                    else
+                                                    {
+                                                        //int a = asfData.mms_sock.Available;
+                                                        asfData.mms_sock.Send(buf, c + 4, SocketFlags.None);
+                                                        //Console.WriteLine("ASF Data sent.");
+                                                        asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
+                                                        //a = asfData.mms_sock.Available;
+                                                    }
                                                 }
                                             }
                                             catch (SocketException ex)
@@ -539,18 +711,18 @@ namespace S2MMSH
 
                             }
                         }
-                        catch (ThreadAbortException tex) {
+                        catch (ThreadAbortException) {
                             //無視
                         }
                         catch (Exception exx){
                             MessageBox.Show(exx.Message,
-        "エラー",
-        MessageBoxButtons.OK,
-        MessageBoxIcon.Error);
+                                "エラー",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                             ProcessInitialize();
                             
                         }
-                        // todo 初期化
+                        
 
                     }));
                     pm.th_ffmpeg.Start();
@@ -600,7 +772,6 @@ namespace S2MMSH
                 //connectButtonStateDeligate(true);
                 this.BeginInvoke(new Action<Boolean>(delegate(Boolean bl) { this.connectButtonStateDeligate(true); }), new object[] { true });
 
-                //logoutput("接続を初期化しました。");
                 this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("接続を初期化しました。"); }), new object[] { "" });
 
                 pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZED;
@@ -788,6 +959,7 @@ namespace S2MMSH
                 asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
 
                 this.button_exec.Enabled = true;
+                this.button_exec_push.Enabled = true;
 
                 logoutput("接続を初期化しました。");
 
@@ -807,6 +979,7 @@ namespace S2MMSH
         public void connectButtonState(Boolean bl)
         {
             this.button_exec.Enabled = bl;
+            this.button_exec_push.Enabled = bl;
         }
 
         public delegate void DisconnectButtonDelegate(Boolean bl);
@@ -928,6 +1101,25 @@ namespace S2MMSH
                     strsize,
                     framerate);
             }
+        }
+
+        /// <summary>
+        /// パケットからMMS Pre-Header を取り除く
+        /// </summary>
+        /// <param name="buf">対象パケット</param>
+        /// <param name="c">パケット長</param>
+        /// <returns>パケット長 - 8 を固定で返す</returns>
+        private int deleteMmsPreHeader(ref byte[] buf, int c)
+        {
+            buf[2] = (byte)(c - 8);
+            buf[3] = (byte)((c - 8) >> 8);
+
+            for (int i = 12; i < c; i++)
+            {
+                buf[i - 8] = buf[i];
+            }
+
+            return c - 8;
         }
 
     }

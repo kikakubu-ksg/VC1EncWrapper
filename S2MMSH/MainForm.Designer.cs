@@ -88,6 +88,9 @@
             this.l_Title = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.label_version = new System.Windows.Forms.Label();
+            this.button_exec_push = new System.Windows.Forms.Button();
+            this.label19 = new System.Windows.Forms.Label();
+            this.textBox_pushAddr = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.groupBox_reencode.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -102,9 +105,9 @@
             // 
             this.button_exec.Location = new System.Drawing.Point(7, 299);
             this.button_exec.Name = "button_exec";
-            this.button_exec.Size = new System.Drawing.Size(463, 23);
+            this.button_exec.Size = new System.Drawing.Size(226, 23);
             this.button_exec.TabIndex = 15;
-            this.button_exec.Text = "接続";
+            this.button_exec.Text = "POP接続";
             this.button_exec.UseVisualStyleBackColor = true;
             this.button_exec.Click += new System.EventHandler(this.button_exec_Click);
             // 
@@ -465,6 +468,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.textBox_pushAddr);
+            this.tabPage1.Controls.Add(this.label19);
             this.tabPage1.Controls.Add(this.label_ffmpegPath);
             this.tabPage1.Controls.Add(this.label18);
             this.tabPage1.Controls.Add(this.panel1);
@@ -690,11 +695,37 @@
             this.label_version.TabIndex = 0;
             this.label_version.Text = "label19";
             // 
+            // button_exec_push
+            // 
+            this.button_exec_push.Location = new System.Drawing.Point(244, 299);
+            this.button_exec_push.Name = "button_exec_push";
+            this.button_exec_push.Size = new System.Drawing.Size(226, 23);
+            this.button_exec_push.TabIndex = 28;
+            this.button_exec_push.Text = "PUSH接続";
+            this.button_exec_push.UseVisualStyleBackColor = true;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(139, 239);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(83, 12);
+            this.label19.TabIndex = 27;
+            this.label19.Text = "PUSH先アドレス";
+            // 
+            // textBox_pushAddr
+            // 
+            this.textBox_pushAddr.Location = new System.Drawing.Point(228, 236);
+            this.textBox_pushAddr.Name = "textBox_pushAddr";
+            this.textBox_pushAddr.Size = new System.Drawing.Size(225, 19);
+            this.textBox_pushAddr.TabIndex = 28;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(476, 474);
+            this.Controls.Add(this.button_exec_push);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox_log);
@@ -786,6 +817,9 @@
         private System.Windows.Forms.Label l_Auther;
         private System.Windows.Forms.TextBox tbx_Title;
         private System.Windows.Forms.Label l_Title;
+        private System.Windows.Forms.Button button_exec_push;
+        private System.Windows.Forms.TextBox textBox_pushAddr;
+        private System.Windows.Forms.Label label19;
     }
 }
 
