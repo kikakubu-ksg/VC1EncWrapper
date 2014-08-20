@@ -703,6 +703,7 @@
             this.button_exec_push.TabIndex = 28;
             this.button_exec_push.Text = "PUSH接続";
             this.button_exec_push.UseVisualStyleBackColor = true;
+            this.button_exec_push.Click += new System.EventHandler(this.button_exec_Click);
             // 
             // label19
             // 

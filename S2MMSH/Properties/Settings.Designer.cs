@@ -238,5 +238,17 @@ namespace S2MMSH.Properties {
                 this["content_rating"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string push_addr {
+            get {
+                return ((string)(this["push_addr"]));
+            }
+            set {
+                this["push_addr"] = value;
+            }
+        }
     }
 }

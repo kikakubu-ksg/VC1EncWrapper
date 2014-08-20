@@ -31,6 +31,7 @@ namespace S2MMSH
             this.textBox_audiorate.Text = Properties.Settings.Default.audiorate;
             this.textBox_videorate.Text = Properties.Settings.Default.videorate;
             this.textBox_exPort.Text = Properties.Settings.Default.port;
+            this.textBox_pushAddr.Text = Properties.Settings.Default.push_addr;
 
             if (Properties.Settings.Default.reencode_flag)
             { // 再エンコあり
@@ -122,7 +123,7 @@ namespace S2MMSH
                 // アドレスチェック (おさしみ標準スタイル)
                 if (!System.Text.RegularExpressions.Regex.IsMatch(
                     textBox_pushAddr.Text,
-                    @"^[-a-zA-Z_0-9]+\.[-a-zA-Z_0-9\.]+:[0-9]{1,5}$",
+                    @"[-a-zA-Z_0-9\.]+:[0-9]{1,5}",
                     System.Text.RegularExpressions.RegexOptions.ECMAScript))
                 {
                     logoutputDelegate("PUSH先アドレスが不正です。");
@@ -161,6 +162,7 @@ namespace S2MMSH
             // init
             this.button_exec.Enabled = false;
             this.button_exec_push.Enabled = false;
+            this.button_disconnect.Enabled = true;
 
             if (!push_mode)
             {
@@ -531,15 +533,18 @@ namespace S2MMSH
                                                 break;
                                             }
                                         }
+                                        byte[] dist = new byte[65535];
                                         if (push_mode)
                                         {
-                                            asfData.asf_header_size = deleteMmsPreHeader(ref buf, c + 4);
+                                            asfData.asf_header_size = deleteMmsPreHeader(buf, c + 4, ref dist) + 4;
+                                            //asfData.asf_header_size = c + 4;
                                         }
                                         else
                                         {
                                             asfData.asf_header_size = c + 4;
+                                            dist = buf;
                                         }
-                                        buf.CopyTo(asfData.asf_header, 0);
+                                        dist.CopyTo(asfData.asf_header, 0);
                                         Console.WriteLine("ASF header registered.");
                                         asfData.asf_status = ASF_STATUS.ASF_STATUS_SET_HEADER;
 
@@ -553,19 +558,33 @@ namespace S2MMSH
                                             // サーバ接続
                                             // Response読み取り
                                             
-                                            
 
                                             //サーバーのホスト名とポート番号
                                             var r =
                                                 new System.Text.RegularExpressions.Regex(
-                                                     @"^([-a-zA-Z_0-9]+\.[-a-zA-Z_0-9\.]+):([0-9]{1,5})$");
-                                            var m = r.Match("textBox_pushAddr.Text");
+                                                     @"([-a-zA-Z_0-9\.]+):([0-9]{1,5})");
+                                            var m = r.Match(textBox_pushAddr.Text);
 
-                                            string host = m.Groups[0].Value;
-                                            int port = int.Parse(m.Groups[1].Value);
+                                            string host = m.Groups[1].Value;
+                                            int port = int.Parse(m.Groups[2].Value);
 
-                                            IPHostEntry hostname = Dns.GetHostEntry(host);
-                                            IPEndPoint RHost = new IPEndPoint(hostname.AddressList[0], port);
+                                            IPAddress ipaddress = null;
+                                            IPHostEntry ipentry = Dns.GetHostEntry(host);
+
+                                            foreach (IPAddress ip in ipentry.AddressList)
+                                            {
+                                                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                                                {
+                                                    ipaddress = ip;
+                                                    break;
+                                                }
+                                            }
+                                            if (ipaddress == null)
+                                            {
+                                                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("接続先アドレスが不正です。"); }), new object[] { "" });
+                                                break;
+                                            }
+                                            IPEndPoint RHost = new IPEndPoint(ipaddress, port);
                                             Socket mClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                                             mClient.Connect(RHost);
 
@@ -584,7 +603,8 @@ namespace S2MMSH
                                             );
 
                                             byte[] httpHeaderBuffer = Encoding.UTF8.GetBytes(httpHeader);
-                                            mClient.Send(httpHeaderBuffer, SocketFlags.None);
+                                            mClient.Send(httpHeaderBuffer);
+                                            while (mClient.Available <= 0);
 
                                             byte[] buffer = new byte[(int)mClient.ReceiveBufferSize];
 
@@ -615,12 +635,13 @@ namespace S2MMSH
                                             Console.Write("httprequest:" + message);
 
                                             if (message.Contains("HTTP/1.1 204"))
+                                            //if (true)
                                             {
                                                 r =
                                                 new System.Text.RegularExpressions.Regex(
-                                                     @"^push-id=([0-9]+)$");
+                                                     @"push-id=([0-9]+)");
                                                 m = r.Match(message);
-                                                String pushid = m.Groups[0].Value;
+                                                String pushid = m.Groups[1].Value;
 
                                                 httpHeader = String.Format(
                                                     "POST / HTTP/1.1\r\n" +
@@ -651,6 +672,8 @@ namespace S2MMSH
                                             else
                                             {
                                                 this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("PUSHサーバとの接続に失敗しました。"); }), new object[] { "" });
+                                                mClient.Close();
+
                                             }
                                         }
                                         else
@@ -669,10 +692,13 @@ namespace S2MMSH
                                                 if (asfData.mms_sock != null)
                                                 {
                                                     if (push_mode)
+                                                    //if (false)
                                                     {
-                                                        int size = deleteMmsPreHeader(ref buf, c + 4);
-                                                        asfData.mms_sock.Send(buf, size, SocketFlags.None);
+                                                        byte[] dist = new byte[65535];
+                                                        int size = deleteMmsPreHeader(buf, c + 4, ref dist);
+                                                        asfData.mms_sock.Send(dist, size + 4, SocketFlags.None);
                                                         asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
+                                                        
                                                     }
                                                     else
                                                     {
@@ -730,7 +756,7 @@ namespace S2MMSH
             }
             
             // closing
-            this.button_disconnect.Enabled = true;
+            //this.button_disconnect.Enabled = true;
         }
 
         /// <summary>
@@ -885,6 +911,7 @@ namespace S2MMSH
             Properties.Settings.Default.audiorate = this.textBox_audiorate.Text;
             Properties.Settings.Default.videorate = this.textBox_videorate.Text;
             Properties.Settings.Default.port = this.textBox_exPort.Text;
+            Properties.Settings.Default.push_addr = this.textBox_pushAddr.Text;
             Properties.Settings.Default.reencode_flag = radioButton_reencode_1.Checked;
             Properties.Settings.Default.enc_width = this.textBox_enc_width.Text;
             Properties.Settings.Default.enc_height = this.textBox_enc_height.Text;
@@ -1108,18 +1135,24 @@ namespace S2MMSH
         /// </summary>
         /// <param name="buf">対象パケット</param>
         /// <param name="c">パケット長</param>
-        /// <returns>パケット長 - 8 を固定で返す</returns>
-        private int deleteMmsPreHeader(ref byte[] buf, int c)
+        /// <returns>パケット長 - 8 - 4を固定で返す</returns>
+        private int deleteMmsPreHeader(byte[] buf, int c, ref byte[] dist)
         {
-            buf[2] = (byte)(c - 8);
-            buf[3] = (byte)((c - 8) >> 8);
+            dist[0] = buf[0];
+            dist[1] = buf[1];
+            dist[2] = (byte)(c - 12);
+            dist[3] = (byte)((c - 12) >> 8);
 
-            for (int i = 12; i < c; i++)
-            {
-                buf[i - 8] = buf[i];
-            }
+            Array.Copy(buf, 12, dist, 4, c - 12);
 
-            return c - 8;
+
+            //for (int i = 12; i < c; i++)
+            //{
+            //    buf[i - 8] = buf[i];
+            //}
+
+
+            return c - 12;
         }
 
     }

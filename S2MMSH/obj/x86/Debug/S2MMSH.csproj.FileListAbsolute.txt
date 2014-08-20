@@ -8,3 +8,11 @@ C:\DEV\S2MMSH\S2MMSH\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\DEV\S2MMSH\S2MMSH\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\DEV\S2MMSH\S2MMSH\obj\x86\Debug\S2MMSH.exe
 C:\DEV\S2MMSH\S2MMSH\obj\x86\Debug\S2MMSH.pdb
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\bin\Debug\S2MMSH.exe.config
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\obj\x86\Debug\S2MMSH.exe
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\obj\x86\Debug\S2MMSH.pdb
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\bin\Debug\S2MMSH.exe
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\bin\Debug\S2MMSH.pdb
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\obj\x86\Debug\S2MMSH.MainForm.resources
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\obj\x86\Debug\S2MMSH.Properties.Resources.resources
+C:\DEV\S2MMSH_B01_PUSH\S2MMSH\obj\x86\Debug\S2MMSH.csproj.GenerateResource.Cache
