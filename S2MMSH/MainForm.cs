@@ -482,9 +482,75 @@ namespace S2MMSH
                                             c = c + content_description_object_size;
                                         }
 
+                                        //// Language List Object 用
+                                        //int language_list_object_size = 33;
+
+                                        ////                                        0000: A9 46 43 7C E0 EF FC 4B-B2 29 39 3E DE 41 5C 85    FC|   K )9> A\ 
+                                        ////                                        0010: 21 00 00 00 00 00 00 00-01 00 06 6A 00 61 00 00   !          j a  
+                                        ////                                        0020: 00 
+                                        //// Language List Object(固定)
+                                        //byte[] language_list_object =
+                                        //    new byte[]{
+                                        //        0xA9, 0x46, 0x43, 0x7C, 0xE0, 0xEF, 0xFC, 0x4B,
+                                        //        0xB2, 0x29, 0x39, 0x3E, 0xDE, 0x41, 0x5C, 0x85,
+                                        //        0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                        //        0x01, 0x00, 0x06, 0x6A, 0x00, 0x61, 0x00, 0x00,
+                                        //        0x00
+                                        //    };
+
+                                        //// existence check
+                                        //// 既に登録されてるかどうかの確認！
+
+                                        //Boolean pflg3 = true;
+                                        //for (j = 0; j < c; j++)
+                                        //{
+                                        //    y = 0;
+                                        //    for (k = 0; k < 16; k++)
+                                        //    {
+                                        //        if (language_list_object[k] == buf[j + k])
+                                        //        {
+                                        //            y++;
+                                        //        }
+                                        //        else { break; }
+                                        //    }
+                                        //    if (y == 16)
+                                        //    {
+                                        //        pflg3 = false;
+                                        //        break;
+                                        //    }
+                                        //}
+
+                                        //if (pflg3)
+                                        //{
+                                        //    byte[] data50 = new byte[50];
+                                        //    int i;
+                                        //    for (i = 0; i < 50; i++)
+                                        //    {
+                                        //        data50[i] = buf[c + 4 - 50 + i];
+                                        //    }
+                                        //    for (i = 0; i < language_list_object_size; i++)
+                                        //    {
+                                        //        buf[c + 4 - 50 + i] = language_list_object[i];
+                                        //    }
+                                        //    for (i = 0; i < 50; i++)
+                                        //    {
+                                        //        buf[c + 4 - 50 + language_list_object_size + i] = data50[i];
+                                        //    }
+
+                                        //    buf[2] = (byte)(c + language_list_object_size);
+                                        //    buf[3] = (byte)((c + language_list_object_size) >> 8);
+                                        //    buf[10] = buf[2];
+                                        //    buf[11] = buf[3];
+                                        //    buf[36] = (byte)(buf[36] + 1); //header property object数
+                                        //    c = c + language_list_object_size;
+                                        //}
+
+
                                         // File Properties Object にGUIDを設定する
                                         // GUIDを生成
                                         byte[] s2mmsh_guid = Guid.NewGuid().ToByteArray();
+                                        // 末尾FF固定
+                                        s2mmsh_guid[15] = 0xFF;
 
                                         // グリニッジ標準の現在時刻
                                         DateTime dtNow = DateTime.Now.ToUniversalTime();
@@ -533,6 +599,13 @@ namespace S2MMSH
                                                 break;
                                             }
                                         }
+
+                                        // Data ObjectにFileID書き込む
+                                        for (int m = 0; m < 16; m++)
+                                        {
+                                            buf[c + 4 - 1 - 10 - m] = s2mmsh_guid[15 - m];
+                                        }
+
                                         byte[] dist = new byte[65535];
                                         if (push_mode)
                                         {
@@ -592,7 +665,7 @@ namespace S2MMSH
                                                 "POST / HTTP/1.1\r\n" +
                                                 "Content-Type: application/x-wms-pushsetup\r\n" +
                                                 "X-Accept-Authentication: NTLM, Digest\r\n" +
-                                                "User-Agent: WMEncoder/9.0.0.3287\r\n" +
+                                                "User-Agent: WMEncoder/12.0.7601.17514\r\n" +
                                                 "Host: " + host + ":" + port + "\r\n" +
                                                 "Content-Length: 0\r\n" +
                                                 "Connection: Keep-Alive\r\n" +
@@ -647,7 +720,7 @@ namespace S2MMSH
                                                     "POST / HTTP/1.1\r\n" +
                                                     "Content-Type: application/x-wms-pushstart\r\n" +
                                                     "X-Accept-Authentication: NTLM, Digest\r\n" +
-                                                    "User-Agent: WMEncoder/9.0.0.3287\r\n" +
+                                                    "User-Agent: WMEncoder/12.0.7601.17514\r\n" +
                                                     "Host: " + host + ":" + port + "\r\n" +
                                                     "Content-Length: 2147483647\r\n" +
                                                     "Connection: Keep-Alive\r\n" +
