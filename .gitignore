@@ -31,3 +31,5 @@ ipch/
 *.dll
 **/Debug/*
 **/Release/*
+S2MMSH/bin/Debug/S2MMSH.exe
+S2MMSH/bin/Debug/S2MMSH.pdb
