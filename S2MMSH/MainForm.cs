@@ -6,6 +6,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Collections;
 
 namespace S2MMSH
 {
@@ -266,7 +267,8 @@ namespace S2MMSH
 
                             pm.process.BeginErrorReadLine(); // 標準エラーは別スレッドでとる
 
-                            int c = 0;
+                            int c = 0; // peyload size
+                            int h = 0; // header object size
                             const int nBytes = 65535;
                             byte[] buf = new byte[nBytes];
                             
@@ -293,6 +295,69 @@ namespace S2MMSH
 
                                     if (buf[1] == 'H')// header packet
                                     {
+                                        // ヘッダオブジェクトサイズ
+                                        h = buf[28] + (buf[29] << 8);
+
+                                        // ストリーム番号を取得する
+
+                                        // Stream Properties Object
+                                        byte[] stream_properties_object =
+                                            new byte[]{
+                                                0x91, 0x07, 0xDC, 0xB7, 0xB7, 0xA9, 0xCF, 0x11,
+                                                0x8E, 0xE6, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65
+                                            };
+
+                                        byte[] stream_type_video =
+                                            new byte[]{
+                                                0xC0, 0xEF, 0x19, 0xBC, 0x4D, 0x5B, 0xCF, 0x11,
+                                                0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B
+                                            };
+
+                                        byte[] stream_type_audio =
+                                            new byte[]{
+                                                0x40, 0x9E, 0x69, 0xF8, 0x4D, 0x5B, 0xCF, 0x11,
+                                                0xA8, 0xFD, 0x00, 0x80, 0x5F, 0x5C, 0x44, 0x2B
+                                            };
+
+                                        int[] stream_num = new int[8];
+                                        int[] stream_type = new int[8];
+                                        int stream_amount = 0;
+
+                                        // オブジェクトの場所を見つける
+                                        for (int spo_j = 0; spo_j < c; spo_j++)
+                                        {
+                                            int spo_y = 0;
+                                            for (int spo_k = 0; spo_k < 16; spo_k++)
+                                            {
+                                                if (stream_properties_object[spo_k] == buf[spo_j + spo_k])
+                                                {
+                                                    spo_y++;
+                                                }
+                                                else { break; }
+                                            }
+                                            if (spo_y == 16) // 読みだす
+                                            {
+                                                if (compBinaryList(buf, spo_j + 24, stream_type_video, 0, 16))
+                                                {
+                                                    stream_num[stream_amount] = buf[spo_j + 72];
+                                                    stream_type[stream_amount] = 1;
+                                                    stream_amount++;
+                                                }
+                                                else if (compBinaryList(buf, spo_j + 24, stream_type_audio, 0, 16))
+                                                {
+                                                    stream_num[stream_amount] = buf[spo_j + 72];
+                                                    stream_type[stream_amount] = 2;
+                                                    stream_amount++;
+                                                }
+
+                                                //break;
+                                            }
+                                        }
+
+                                        if (stream_amount == 0) {
+                                            this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("有効なストリームがありません。"); }), new object[] { "" });
+                                            break;
+                                        }
                                         //bitrate property
                                         int bitrate;
                                         int audiorate;
@@ -312,25 +377,49 @@ namespace S2MMSH
                                         if (audiorate == 0) audiorate = 128000;
 
                                         // Stream Bitrate Properties Object
-                                        byte[] bitrate_property =
+                                        
+                                        byte[] bitrate_property_head =
                                             new byte[]{
                                                 0xCE, 0x75, 0xF8, 0x7B, 0x8D, 0x46, 0xD1, 0x11,
                                                 0x8D, 0x82, 0x00, 0x60, 0x97, 0xC9, 0xA2, 0xB2,
-                                                0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                                0x02, 0x00, //Bitrate Records Count
-                                                // video bitrate
-                                                0x01, 0x00, 
-                                                (byte)bitrate, 
-                                                (byte)((bitrate >> 8) & 0xFF), 
-                                                (byte)((bitrate >> 16) & 0xFF), 
-                                                (byte)((bitrate >> 24) & 0xFF), 
-                                                // audio bitrate 12800bit/sec
-                                                0x02, 0x00, 
-                                                (byte)audiorate, 
-                                                (byte)((audiorate >> 8) & 0xFF), 
-                                                (byte)((audiorate >> 16) & 0xFF), 
-                                                (byte)((audiorate >> 24) & 0xFF)
+                                                (byte)(26+6*stream_amount), 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                (byte)stream_amount, 0x00 //Bitrate Records Count
                                             };
+
+                                        ArrayList list1 = new ArrayList(bitrate_property_head);
+
+                                        for(int bph_i=0;bph_i<stream_amount;bph_i++)
+                                        {
+                                            
+                                            if (stream_type[bph_i] == 1) // video
+                                            {
+                                                list1.AddRange(
+                                                    new ArrayList(new byte[]{
+                                                    // video bitrate
+                                                    (byte)stream_num[bph_i], 0x00, 
+                                                    (byte)bitrate, 
+                                                    (byte)((bitrate >> 8) & 0xFF), 
+                                                    (byte)((bitrate >> 16) & 0xFF), 
+                                                    (byte)((bitrate >> 24) & 0xFF)
+                                                }));
+                                            }
+                                            else if (stream_type[bph_i] == 2) // audio
+                                            {
+                                                list1.AddRange(
+                                                    new ArrayList(
+                                                    new byte[]{
+                                                    // video bitrate
+                                                    (byte)stream_num[bph_i], 0x00, 
+                                                    (byte)audiorate, 
+                                                    (byte)((audiorate >> 8) & 0xFF), 
+                                                    (byte)((audiorate >> 16) & 0xFF), 
+                                                    (byte)((audiorate >> 24) & 0xFF)
+                                                }));
+                                            }
+                                        }
+
+                                        byte[] bitrate_property = (byte[])list1.ToArray(typeof (byte));
+                                        int bitrate_property_size = list1.Count;
 
                                         // existence check
                                         // 既に登録されてるかどうかの確認！
@@ -363,21 +452,24 @@ namespace S2MMSH
                                             {
                                                 data50[i] = buf[c + 4 - 50 + i];
                                             }
-                                            for (i = 0; i < 38; i++)
+                                            for (i = 0; i < bitrate_property_size; i++)
                                             {
                                                 buf[c + 4 - 50 + i] = bitrate_property[i];
                                             }
                                             for (i = 0; i < 50; i++)
                                             {
-                                                buf[c + 4 - 50 + 38 + i] = data50[i];
+                                                buf[c + 4 - 50 + bitrate_property_size + i] = data50[i];
                                             }
 
-                                            buf[2] = (byte)(c + 38);
-                                            buf[3] = (byte)((c + 38) >> 8);
+                                            buf[2] = (byte)(c + bitrate_property_size);
+                                            buf[3] = (byte)((c + bitrate_property_size) >> 8);
                                             buf[10] = buf[2];
                                             buf[11] = buf[3];
+                                            buf[28] = (byte)(h + bitrate_property_size);
+                                            buf[29] = (byte)((h + bitrate_property_size) >> 8);
                                             buf[36] = (byte)(buf[36] + 1);
-                                            c = c + 38;
+                                            c = c + bitrate_property_size;
+                                            h = h + bitrate_property_size;
                                         }
 
                                         // Content Description Object用
@@ -478,73 +570,145 @@ namespace S2MMSH
                                             buf[3] = (byte)((c + content_description_object_size) >> 8);
                                             buf[10] = buf[2];
                                             buf[11] = buf[3];
+                                            buf[28] = (byte)(h + content_description_object_size);
+                                            buf[29] = (byte)((h + content_description_object_size) >> 8);
                                             buf[36] = (byte)(buf[36] + 1);
                                             c = c + content_description_object_size;
+                                            h = h + content_description_object_size;
                                         }
 
-                                        //// Language List Object 用
-                                        //int language_list_object_size = 33;
+                                        // header extension objectに追加する
+                                        // 何も入ってない状態を前提とする
 
-                                        ////                                        0000: A9 46 43 7C E0 EF FC 4B-B2 29 39 3E DE 41 5C 85    FC|   K )9> A\ 
-                                        ////                                        0010: 21 00 00 00 00 00 00 00-01 00 06 6A 00 61 00 00   !          j a  
-                                        ////                                        0020: 00 
-                                        //// Language List Object(固定)
-                                        //byte[] language_list_object =
-                                        //    new byte[]{
-                                        //        0xA9, 0x46, 0x43, 0x7C, 0xE0, 0xEF, 0xFC, 0x4B,
-                                        //        0xB2, 0x29, 0x39, 0x3E, 0xDE, 0x41, 0x5C, 0x85,
-                                        //        0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                        //        0x01, 0x00, 0x06, 0x6A, 0x00, 0x61, 0x00, 0x00,
-                                        //        0x00
-                                        //    };
+                                        // Header Extension Object 場所特定 
+                                        byte[] header_extension_object =
+                                            new byte[]{
+                                                0xB5, 0x03, 0xBF, 0x5F, 0x2E, 0xA9, 0xCF, 0x11,
+                                                0x8E, 0xE3, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65
+                                            };
+                                        int heo_p=0;
+                                        for (int heo_j = 0; heo_j < c; heo_j++)
+                                        {
+                                            int heo_y = 0;
+                                            for (int heo_k = 0; heo_k < 16; heo_k++)
+                                            {
+                                                if (header_extension_object[heo_k] == buf[heo_j + heo_k])
+                                                {
+                                                    heo_y++;
+                                                }
+                                                else { break; }
+                                            }
+                                            if (heo_y == 16) // 読みだす
+                                            {
+                                                heo_p = heo_j;
+                                                break;
+                                            }
+                                        }
 
-                                        //// existence check
-                                        //// 既に登録されてるかどうかの確認！
+                                        // Extended Stream Properties Object 作成
+                                        byte[] extended_stream_properties_object =
+                                            new byte[]{
+                                                0xCB, 0xA5, 0xE6, 0x14, 0x72, 0xC6, 0x32, 0x43,
+                                                0x83, 0x99, 0xA9, 0x69, 0x52, 0x06, 0x5B, 0x5A
+                                            };
 
-                                        //Boolean pflg3 = true;
-                                        //for (j = 0; j < c; j++)
-                                        //{
-                                        //    y = 0;
-                                        //    for (k = 0; k < 16; k++)
-                                        //    {
-                                        //        if (language_list_object[k] == buf[j + k])
-                                        //        {
-                                        //            y++;
-                                        //        }
-                                        //        else { break; }
-                                        //    }
-                                        //    if (y == 16)
-                                        //    {
-                                        //        pflg3 = false;
-                                        //        break;
-                                        //    }
-                                        //}
+                                        mergedList = new System.Collections.Generic.List<byte>();
 
-                                        //if (pflg3)
-                                        //{
-                                        //    byte[] data50 = new byte[50];
-                                        //    int i;
-                                        //    for (i = 0; i < 50; i++)
-                                        //    {
-                                        //        data50[i] = buf[c + 4 - 50 + i];
-                                        //    }
-                                        //    for (i = 0; i < language_list_object_size; i++)
-                                        //    {
-                                        //        buf[c + 4 - 50 + i] = language_list_object[i];
-                                        //    }
-                                        //    for (i = 0; i < 50; i++)
-                                        //    {
-                                        //        buf[c + 4 - 50 + language_list_object_size + i] = data50[i];
-                                        //    }
+                                        for (int i = 0; i < stream_amount; i++) {
+                                            if (stream_type[i] == 1) // video
+                                            {
+                                                mergedList.AddRange(
+                                                    new System.Collections.Generic.List<byte>(extended_stream_properties_object));
+                                                mergedList.AddRange(
+                                                    new System.Collections.Generic.List<byte>(new byte[]{
+                                                    0x58, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // object size
+                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // start time
+                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // end time
+                                                    (byte)bitrate, 
+                                                    (byte)((bitrate >> 8) & 0xFF), 
+                                                    (byte)((bitrate >> 16) & 0xFF), 
+                                                    (byte)((bitrate >> 24) & 0xFF),
+                                                    0x88, 0x13, 0x00, 0x00, // buffer size 5000
+                                                    0x00, 0x00, 0x00, 0x00,
+                                                    (byte)bitrate, 
+                                                    (byte)((bitrate >> 8) & 0xFF), 
+                                                    (byte)((bitrate >> 16) & 0xFF), 
+                                                    (byte)((bitrate >> 24) & 0xFF),
+                                                    0x88, 0x13, 0x00, 0x00,
+                                                    0x00, 0x00, 0x00, 0x00,
+                                                    0x00, 0x00, 0x00, 0x00, // muximam object size 
+                                                    0x00, 0x00, 0x00, 0x00, // flag
+                                                    (byte)stream_num[i], 0x00, // stream number
+                                                    0x00, 0x00, 
+                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // avarage time per frame
+                                                    0x00, 0x00, 
+                                                    0x00, 0x00
 
-                                        //    buf[2] = (byte)(c + language_list_object_size);
-                                        //    buf[3] = (byte)((c + language_list_object_size) >> 8);
-                                        //    buf[10] = buf[2];
-                                        //    buf[11] = buf[3];
-                                        //    buf[36] = (byte)(buf[36] + 1); //header property object数
-                                        //    c = c + language_list_object_size;
-                                        //}
+                                                }));
+                                            }
+                                            else if (stream_type[i] == 2) // audio
+                                            {
+                                                mergedList.AddRange(
+                                                    new System.Collections.Generic.List<byte>(extended_stream_properties_object));
+                                                mergedList.AddRange(
+                                                    new System.Collections.Generic.List<byte>(new byte[]{
+                                                    0x58, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // object size
+                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // start time
+                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // end time
+                                                    (byte)audiorate, 
+                                                    (byte)((audiorate >> 8) & 0xFF), 
+                                                    (byte)((audiorate >> 16) & 0xFF), 
+                                                    (byte)((audiorate >> 24) & 0xFF),
+                                                    0x88, 0x13, 0x00, 0x00, // buffer size 5000
+                                                    0x00, 0x00, 0x00, 0x00,
+                                                    (byte)audiorate, 
+                                                    (byte)((audiorate >> 8) & 0xFF), 
+                                                    (byte)((audiorate >> 16) & 0xFF), 
+                                                    (byte)((audiorate >> 24) & 0xFF),
+                                                    0x88, 0x13, 0x00, 0x00,
+                                                    0x00, 0x00, 0x00, 0x00,
+                                                    0x00, 0x00, 0x00, 0x00, // muximam object size 
+                                                    0x00, 0x00, 0x00, 0x00, // flag
+                                                    (byte)stream_num[i], 0x00, // stream number
+                                                    0x00, 0x00, 
+                                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // avarage time per frame
+                                                    0x00, 0x00, 
+                                                    0x00, 0x00
 
+                                                }));
+                                            }
+                                        }
+
+                                        int extended_stream_properties_object_size = mergedList.Count;
+                                        extended_stream_properties_object = mergedList.ToArray();
+
+                                        // Header Extension Object 修正
+                                        buf[heo_p + 16] = (byte)(46 + extended_stream_properties_object_size);
+                                        buf[heo_p + 17] = (byte)((46 + extended_stream_properties_object_size) >> 8);
+                                        buf[heo_p + 42] = (byte)(extended_stream_properties_object_size);
+                                        buf[heo_p + 43] = (byte)((extended_stream_properties_object_size) >> 8);
+                                        
+                                        // データ挿入
+                                        // byte[] dataRemain = new byte[c + 4 - (heo_p + 46)];
+                                        int heo_i;
+                                        for (heo_i = 0; heo_i < c + 4 - (heo_p + 46); heo_i++)
+                                        {
+                                            buf[c + 4 + extended_stream_properties_object_size - 1 - heo_i] = buf[c + 4 - 1 - heo_i];
+                                        }
+                                        for (heo_i = 0; heo_i < extended_stream_properties_object_size; heo_i++)
+                                        {
+                                            buf[heo_p + 46 + heo_i] = extended_stream_properties_object[heo_i];
+                                        }
+
+                                        // サイズ更新
+                                        buf[2] = (byte)(c + extended_stream_properties_object_size);
+                                        buf[3] = (byte)((c + extended_stream_properties_object_size) >> 8);
+                                        buf[10] = buf[2];
+                                        buf[11] = buf[3];
+                                        buf[28] = (byte)(h + extended_stream_properties_object_size);
+                                        buf[29] = (byte)((h + extended_stream_properties_object_size) >> 8);
+                                        c = c + extended_stream_properties_object_size;
+                                        h = h + extended_stream_properties_object_size;
 
                                         // File Properties Object にGUIDを設定する
                                         // GUIDを生成
@@ -584,9 +748,8 @@ namespace S2MMSH
                                                 }
                                                 else { break; }
                                             }
-                                            if (y == 16)
+                                            if (y == 16) // 書き込む
                                             {
-                                                //pflg2 = false;
                                                 for (int m = 0; m < 16; m++)
                                                 {
                                                     buf[j + 24 + m] = s2mmsh_guid[m];
@@ -664,7 +827,7 @@ namespace S2MMSH
                                             String httpHeader = String.Format(
                                                 "POST / HTTP/1.1\r\n" +
                                                 "Content-Type: application/x-wms-pushsetup\r\n" +
-                                                "X-Accept-Authentication: NTLM, Digest\r\n" +
+                                                "X-Accept-Authentication: Negotiate, NTLM, Digest\r\n" +
                                                 "User-Agent: WMEncoder/12.0.7601.17514\r\n" +
                                                 "Host: " + host + ":" + port + "\r\n" +
                                                 "Content-Length: 0\r\n" +
@@ -719,7 +882,7 @@ namespace S2MMSH
                                                 httpHeader = String.Format(
                                                     "POST / HTTP/1.1\r\n" +
                                                     "Content-Type: application/x-wms-pushstart\r\n" +
-                                                    "X-Accept-Authentication: NTLM, Digest\r\n" +
+                                                    "X-Accept-Authentication: Negotiate, NTLM, Digest\r\n" +
                                                     "User-Agent: WMEncoder/12.0.7601.17514\r\n" +
                                                     "Host: " + host + ":" + port + "\r\n" +
                                                     "Content-Length: 2147483647\r\n" +
@@ -734,8 +897,15 @@ namespace S2MMSH
                                                 mClient.Send(httpHeaderBuffer, SocketFlags.None);
                                                 mClient.Send(asfData.asf_header, asfData.asf_header_size, SocketFlags.None);
                                                 Console.WriteLine("ASF header sent.");
-                                                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("ASFヘッダを送信しました。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
+                                                try //クライアントが即死する場合がある
+                                                {
+                                                    this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("ASFヘッダを送信しました。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
 
+                                                }
+                                                catch (Exception)
+                                                {
+                                                   
+                                                }
                                                 // MMSソケット登録
                                                 asfData.mms_sock = mClient;
                                                 // ステータス更新
@@ -1226,6 +1396,20 @@ namespace S2MMSH
 
 
             return c - 12;
+        }
+
+        private Boolean compBinaryList(byte[] buf, int c, byte[] stream, int d, int size)
+        {
+            int y = 0;
+            for (int i = 0; i < size; i++) {
+                if (buf[i + c] == stream[i + d])
+                {
+                    y++;
+                }
+            }
+            if (y == size) return true;
+            else return false;
+            
         }
 
     }

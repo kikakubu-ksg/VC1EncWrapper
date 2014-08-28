@@ -143,9 +143,16 @@ namespace S2MMSH
                         mClient.Send(httpHeaderBuffer);
                         mClient.Send(asfData.asf_header, asfData.asf_header_size, SocketFlags.None);
                         Console.WriteLine("ASF header sent.");
-                        mForm.BeginInvoke(new Action<String>(delegate(String str) { mForm.logoutput("ASFヘッダを送信しました。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
-                            
-                        if (message.Contains("kagami"))
+                        try
+                        {
+                            mForm.BeginInvoke(new Action<String>(delegate(String str) { mForm.logoutput("ASFヘッダを送信しました。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
+
+                        }
+                        catch (Exception)
+                        {
+                        }    
+                        //if (message.Contains("kagami"))
+                        if(true)
                         {
                             asfData.mms_sock = mClient;
                             asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_HEADER_SEND;
