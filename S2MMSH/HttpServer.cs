@@ -71,7 +71,6 @@ namespace S2MMSH
                 if (asfData.asf_status == ASF_STATUS.ASF_STATUS_SET_HEADER && // asfヘッダ登録済み
                     asfData.mmsh_status != MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING) // クライアントなし
                 {
-                    //if (message.Contains("xPlayStrm")) //play
                     if (message.Contains("stream-switch"))
                     {
                         httpHeader = String.Format(
@@ -81,13 +80,9 @@ namespace S2MMSH
                             "Pragma: no-cache\r\n" +
                             "Pragma: client-id=2236067900\r\n" +
                             "Pragma: features=\"broadcast,playlist\"\n" +
-                            //"Content-Type: application/vnd.ms.wms-hdr.asfv1\r\n" +
-                            //"Content-Length: %d\r\n" +
-                            //"Content-Type: video/x-ms-asf\r\n" +
                             "Content-Type: application/x-mms-framed\r\n" +
                             "Connection: Keep-Alive\r\n" +
                             "\r\n"
-                            //, asfData.asf_header_size
                         );
 
                         httpHeaderBuffer = Encoding.UTF8.GetBytes(httpHeader);
@@ -113,12 +108,8 @@ namespace S2MMSH
                                    "Pragma: features=\"broadcast,playlist\"\r\n" +
                                    "Keep-Alive: timeout=1, max=0\r\n" +
                                    "Content-Type: application/vnd.ms.wms-hdr.asfv1\r\n" +
-                                   //"Content-Length: %d\r\n" +
-                                //"Content-Type: video/x-ms-asf\r\n" +
-                                //"Content-Type: application/x-mms-framed\r\n" +
                                    "Connection: close\r\n" +
                                    "\r\n"
-                                //, asfData.asf_header_size
                                );
                         }
                         else {
@@ -131,12 +122,8 @@ namespace S2MMSH
                                    "Pragma: features=\"broadcast,playlist\"\r\n" +
                                    "Keep-Alive: timeout=1, max=0\r\n" +
                                    "Content-Type: application/vnd.ms.wms-hdr.asfv1\r\n" +
-                                   //"Content-Length: %d\r\n" +
-                                //"Content-Type: video/x-ms-asf\r\n" +
-                                //"Content-Type: application/x-mms-framed\r\n" +
                                    "Connection: close\r\n" +
                                    "\r\n"
-                                //, asfData.asf_header_size
                                   );
                         }
                         httpHeaderBuffer = Encoding.UTF8.GetBytes(httpHeader);
@@ -152,16 +139,16 @@ namespace S2MMSH
                         {
                         }    
                         //if (message.Contains("kagami"))
-                        if(true)
-                        {
-                            asfData.mms_sock = mClient;
-                            asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_HEADER_SEND;
-                        }
-                        else
-                        {
-                            mForm.BeginInvoke(new Action<String>(delegate(String str) { mForm.logoutput("クライアントを切断します。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
-                            mClient.Close();
-                        }
+                        //if(true)
+                        //{
+                        asfData.mms_sock = mClient;
+                        asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_HEADER_SEND;
+                        //}
+                        //else
+                        //{
+                        //    mForm.BeginInvoke(new Action<String>(delegate(String str) { mForm.logoutput("クライアントを切断します。[" + mClient.RemoteEndPoint.ToString() + "]"); }), new object[] { "" });
+                        //    mClient.Close();
+                        //}
 
                     } else {
                         mForm.BeginInvoke(new Action<String>(delegate(String str) { mForm.logoutput("クライアントを切断します。"); }), new object[] { "" });

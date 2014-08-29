@@ -984,10 +984,12 @@ namespace S2MMSH
                             //無視
                         }
                         catch (Exception exx){
-                            MessageBox.Show(exx.Message,
-                                "エラー",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
+                            //MessageBox.Show(exx.Message,
+                            //    "エラー",
+                            //    MessageBoxButtons.OK,
+                            //    MessageBoxIcon.Error);
+                            this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput(exx.Message); }), new object[] { "" });
+                                    
                             ProcessInitialize();
                             
                         }
@@ -1060,6 +1062,52 @@ namespace S2MMSH
         {
             //プロセスが終了したときに実行される
             logoutput("ffmpegが終了しました。");
+            ProcessManager pm = ProcessManager.Instance;
+            if (pm.ffmpegstatus == FFMPEG_STATUS.FFMPEG_STATUS_PROCESS) // 初期化
+            {
+                //pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZING;
+                //logoutput("接続を初期化します。");
+                //this.button_disconnect.Enabled = false;
+
+                // スレッド・プロセス終了
+                if (pm.process != null)
+                {
+                    pm.process = null;
+                }
+                if (pm.th_server != null)
+                {
+                    pm.server.Close();
+                    if (pm.th_server.IsAlive)
+                        pm.th_server.Abort();
+                    pm.th_server = null;
+                }
+
+                if (pm.th_ffmpeg != null)
+                {
+                    if (pm.th_ffmpeg.IsAlive)
+                        pm.th_ffmpeg.Abort();
+                    pm.th_ffmpeg = null;
+                }
+
+                // 初期化
+                AsfData asfData = AsfData.Instance;
+                asfData.asf_status = ASF_STATUS.ASF_STATUS_NULL;
+                asfData.asf_header_size = 0;
+                asfData.asf_header = new byte[65535];
+                asfData.mms_sock = null;
+                asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
+
+                this.button_exec.Enabled = true;
+                this.button_exec_push.Enabled = true;
+
+                logoutput("接続を初期化しました。");
+
+                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZED;
+            }
+            else
+            {
+                logoutput("接続は初期化中です。");
+            }
             ProcessInitialize();
         }
 
@@ -1182,12 +1230,17 @@ namespace S2MMSH
             ProcessManager pm = ProcessManager.Instance;
             if (pm.ffmpegstatus == FFMPEG_STATUS.FFMPEG_STATUS_PROCESS) // 初期化
             {
-                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZING;
-                logoutput("接続を初期化します。");
+                //pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZING;
+                //logoutput("接続を初期化します。");
                 this.button_disconnect.Enabled = false;
 
+                if (pm.process == null)
+                {
+                    ProcessInitialize();
+                }
+                
                 // スレッド・プロセス終了
-                if (pm.process != null)
+                else
                 {
                     if (!pm.process.HasExited)
                     {
@@ -1203,37 +1256,9 @@ namespace S2MMSH
                         pm.process.Kill();
                     }
 
-                    pm.process = null;
+                    //pm.process = null;
                 }
-                if (pm.th_server != null)
-                {
-                    pm.server.Close();
-                    if (pm.th_server.IsAlive)
-                        pm.th_server.Abort();
-                    pm.th_server = null;
-                }
-
-                if (pm.th_ffmpeg != null)
-                {
-                    if (pm.th_ffmpeg.IsAlive)
-                        pm.th_ffmpeg.Abort();
-                    pm.th_ffmpeg = null;
-                }
-
-                // 初期化
-                AsfData asfData = AsfData.Instance;
-                asfData.asf_status = ASF_STATUS.ASF_STATUS_NULL;
-                asfData.asf_header_size = 0;
-                asfData.asf_header = new byte[65535];
-                asfData.mms_sock = null;
-                asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
-
-                this.button_exec.Enabled = true;
-                this.button_exec_push.Enabled = true;
-
-                logoutput("接続を初期化しました。");
-
-                pm.ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_INITIALIZED;
+                
             }
             else {
                 logoutput("接続は初期化中です。");
@@ -1308,6 +1333,12 @@ namespace S2MMSH
             {
                 Console.WriteLine(radioButton.Text + "が選択されました。");
                 textBox_ffmpegcom.Enabled = true;
+                // 再エンコードGBを無効化
+                panel1.Enabled = false;
+                // 再エンコード入力を無効化
+                groupBox_reencode.Enabled = false;
+                // 入力ストリームを無効化
+                textBox_inputstream.Enabled = false;
             }
         }
 
@@ -1319,6 +1350,14 @@ namespace S2MMSH
             {
                 Console.WriteLine(radioButton.Text + "が選択されました。");
                 textBox_ffmpegcom.Enabled = false;
+                // 再エンコードGBを有効化
+                panel1.Enabled = true;
+                // 再エンコードありならば再エンコード入力を有効化
+                if (radioButton_reencode_1.Checked) {
+                    groupBox_reencode.Enabled = true;
+                }
+                // 入力ストリームを有効化
+                textBox_inputstream.Enabled = true;
             }
         }
 
