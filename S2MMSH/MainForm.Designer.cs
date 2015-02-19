@@ -91,6 +91,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.label_version = new System.Windows.Forms.Label();
             this.button_exec_push = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.groupBox_reencode.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -693,6 +694,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.checkBox1);
             this.tabPage3.Controls.Add(this.label_version);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
@@ -720,6 +722,16 @@
             this.button_exec_push.Text = "PUSH接続";
             this.button_exec_push.UseVisualStyleBackColor = true;
             this.button_exec_push.Click += new System.EventHandler(this.button_exec_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(33, 85);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(83, 16);
+            this.checkBox1.TabIndex = 1;
+            this.checkBox1.Text = "change_flag";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -821,6 +833,7 @@
         private System.Windows.Forms.Button button_exec_push;
         private System.Windows.Forms.TextBox textBox_pushAddr;
         private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

@@ -72,6 +72,9 @@ namespace S2MMSH
         public Socket server = null;
         public FFMPEG_STATUS ffmpegstatus = FFMPEG_STATUS.FFMPEG_STATUS_NULL;
 
+        public Thread th_ffmpeg2 = null;
+        public Process process2 = null;
+
         private ProcessManager()
         {
             Console.WriteLine("Created instance.");
