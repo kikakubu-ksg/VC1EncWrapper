@@ -89,9 +89,11 @@
             this.tbx_Title = new System.Windows.Forms.TextBox();
             this.l_Title = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label_version = new System.Windows.Forms.Label();
             this.button_exec_push = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.panel1.SuspendLayout();
             this.groupBox_reencode.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -251,7 +253,7 @@
             this.textBox_log.Multiline = true;
             this.textBox_log.Name = "textBox_log";
             this.textBox_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_log.Size = new System.Drawing.Size(450, 83);
+            this.textBox_log.Size = new System.Drawing.Size(811, 83);
             this.textBox_log.TabIndex = 17;
             // 
             // label7
@@ -704,6 +706,16 @@
             this.tabPage3.Text = "バージョン情報";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(33, 85);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(83, 16);
+            this.checkBox1.TabIndex = 1;
+            this.checkBox1.Text = "change_flag";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // label_version
             // 
             this.label_version.AutoSize = true;
@@ -723,21 +735,22 @@
             this.button_exec_push.UseVisualStyleBackColor = true;
             this.button_exec_push.Click += new System.EventHandler(this.button_exec_Click);
             // 
-            // checkBox1
+            // listView1
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(33, 85);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(83, 16);
-            this.checkBox1.TabIndex = 1;
-            this.checkBox1.Text = "change_flag";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1});
+            this.listView1.Location = new System.Drawing.Point(485, 25);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(340, 326);
+            this.listView1.TabIndex = 29;
+            this.listView1.UseCompatibleStateImageBehavior = false;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(476, 474);
+            this.ClientSize = new System.Drawing.Size(837, 474);
+            this.Controls.Add(this.listView1);
             this.Controls.Add(this.button_exec_push);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label7);
@@ -834,6 +847,8 @@
         private System.Windows.Forms.TextBox textBox_pushAddr;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
     }
 }
 
