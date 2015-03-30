@@ -20,6 +20,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -66,14 +67,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RAW2ES.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="VC1EncES.cpp" />
+    <ClCompile Include="VC1EncWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RAW2ES.h" />
+    <ClInclude Include="VC1EncWrapper.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="VC1EncES.h" />
     <ClInclude Include="vc1prosdk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
