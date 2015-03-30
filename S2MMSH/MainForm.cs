@@ -165,6 +165,16 @@ namespace S2MMSH
             this.button_exec_push.Enabled = false;
             this.button_disconnect.Enabled = true;
 
+            if (!this.radioButton_reencode_1.Checked) 
+            { 
+                /// TODO
+                // VC1enc initialize
+                // VC1encラッパーDLLロード
+                // パラメータ設定
+                // プライベートコーデック情報取得
+            }
+
+
             if (!push_mode)
             {
                 // httpserver listening
@@ -212,7 +222,7 @@ namespace S2MMSH
                                    url,
                                    @"^http://",
                                    "mmsh://");
-                                if (this.radioButton_reencode_1.Checked == false)
+                                if (!this.radioButton_reencode_1.Checked)
                                 {
                                     startInfo.Arguments = String.Format(" -v error -i {0} -c copy -f asf_stream -", url);
                                 }
@@ -243,13 +253,16 @@ namespace S2MMSH
                                     if (framerate == 0) framerate = 15;
 
                                     startInfo.Arguments = String.Format(
-                                        " -v error -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -",
+                                        // " -v error -i {0} -acodec wmav2 -ab {1} -vcodec wmv2 -vb {2} -s {3} -r {4} -f asf_stream -",
+                                        " -v error -i {0} -acodec mp3 -ab {1} -vcodec yuv4 -s {2} -r {3} -f asf_stream -",
                                         url,
                                         bitrate_a,
-                                        bitrate_v,
+                                        // bitrate_v,
                                         strsize,
                                         framerate);
-                                }
+
+
+                                }// if (this.radioButton_reencode_1.Checked == false)
                             }
                             //startInfo.Arguments = " -v quiet -i tcp://127.0.0.1:6665 -c copy -f asf_stream -";
                             //startInfo.Arguments = " -v quiet -i rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov -c copy -f asf_stream -";
@@ -293,7 +306,7 @@ namespace S2MMSH
                                         break;
                                     }
 
-                                    if (buf[1] == 'H')// header packet
+                                    if (buf[1] == 'H' && asfData.asf_header_size == 0)// header packet ヘッダが既に作成されていれば無視
                                     {
                                         // ヘッダオブジェクトサイズ
                                         h = buf[28] + (buf[29] << 8);
@@ -716,7 +729,7 @@ namespace S2MMSH
                                         // GUIDを生成
                                         byte[] s2mmsh_guid = Guid.NewGuid().ToByteArray();
                                         // 末尾FF固定
-                                        s2mmsh_guid[15] = 0xFF;
+                                        // s2mmsh_guid[15] = 0xFF;
 
                                         // グリニッジ標準の現在時刻
                                         DateTime dtNow = DateTime.Now.ToUniversalTime();
@@ -770,6 +783,17 @@ namespace S2MMSH
                                         {
                                             buf[c + 4 - 1 - 10 - m] = s2mmsh_guid[15 - m];
                                         }
+
+                                        // VC1ヘッダ修正処理
+                                        if (this.radioButton_reencode_1.Checked)
+                                        {
+                                            /// TODO
+                                            /// プライベートコーデック情報を書き換える
+                                            /// fourCCを書き換える
+                                            /// ビットレート情報などを書き換える
+                                            /// あとコーデック情報とか書き換えておく（おそらく取得可能）
+                                        }// if (this.radioButton_reencode_1.Checked)
+
 
                                         byte[] dist = new byte[65535];
                                         if (push_mode)
@@ -935,8 +959,15 @@ namespace S2MMSH
                                         {
                                             try
                                             {
-                                                if (asfData.mms_sock != null && checkBox1.Checked == false)
+                                                if (asfData.mms_sock != null)
                                                 {
+                                                    if (this.radioButton_reencode_1.Checked)
+                                                    { 
+                                                        /// ASFDataObjectペイロード抽出
+                                                        /// VC1エンコーディング処理
+                                                        /// ASFDataObject再構築処理
+                                                        /// MMSHパケットサイズ修正処理
+                                                    }
                                                     if (push_mode)
                                                     //if (false)
                                                     {
@@ -948,19 +979,12 @@ namespace S2MMSH
                                                     }
                                                     else
                                                     {
-                                                        //int a = asfData.mms_sock.Available;
-                                                        //Random cRandom = new System.Random();
 
-                                                        ////TESTCODE
-                                                        //int r = cRandom.Next(10);
-                                                        //if (r != 0)
-                                                        //{
-                                                            asfData.mms_sock.Send(buf, c + 4, SocketFlags.None);
+                                                        asfData.mms_sock.Send(buf, c + 4, SocketFlags.None);
 
-                                                            //Console.WriteLine("ASF Data sent.");
-                                                            asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
-                                                            //a = asfData.mms_sock.Available;
-                                                        //}
+                                                        //Console.WriteLine("ASF Data sent.");
+                                                        asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
+                                                           
                                                     }
                                                 }
                                             }
@@ -1014,178 +1038,11 @@ namespace S2MMSH
 
                     }));
                     pm.th_ffmpeg.Start();
-                   
-                }
 
- //TEST
-                if (pm.th_ffmpeg2 == null)
-                {
-                    pm.th_ffmpeg2 = new Thread(new ThreadStart(delegate()
-                    {
-                        try
-                        {
-                            pm.process2 = new Process();
-                            pm.process2.SynchronizingObject = this;
-                            //イベントハンドラの追加
-                            pm.process2.Exited += new EventHandler(p_Exited2);
-                            pm.process2.ErrorDataReceived += PrintErrorData;
-                            //pm.process.ErrorDataReceived += new DataReceivedEventHandler(NetErrorDataHandler);
-                            //プロセスが終了したときに Exited イベントを発生させる
-                            pm.process2.EnableRaisingEvents = true;
+                }// end if (pm.th_ffmpeg == null)
 
-                            // ffmpeg commandline
-                            //string command = 
-                            //     this.textBox_ffmpegPath.Text + 
-                            // " -v quiet -i tcp://127.0.0.1:6665 -c copy -f asf_stream -";
-                            ProcessStartInfo startInfo = new ProcessStartInfo();
-                            startInfo.FileName = this.textBox_ffmpegPath.Text;
-                            
-                            //startInfo.Arguments = " -v quiet -i tcp://127.0.0.1:6665 -c copy -f asf_stream -";
-                            //startInfo.Arguments = " -v quiet -i rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov -c copy -f asf_stream -";
-                            //startInfo.Arguments = " -v error -i mmsh://win.global.playstream.com/showcase/mathtv/trig_4.5_350k.wmv -c copy -f asf_stream -";
-                            //startInfo.Arguments = " -v quiet -i mmsh://218.228.167.141:8888 -c copy -f asf_stream -";
-                            //startInfo.Arguments = " -v error -rtbufsize 10MB -f dshow -i video=\"USB 2.0 UVC 0.3M Webcam\":audio=\"マイク (Realtek High Definition Au\" -threads 0 -r 15 -s 512x384 -sws_flags lanczos -pix_fmt yuv420p -maxrate 256k -bufsize 560k -acodec libmp3lame -ar 44100 -ab 32k -ac 2 -vol 256 -vcodec  libx264 -preset fast -map 0:1 -map 0:0 -f asf_stream -";
-                            //startInfo.Arguments = " -v error -i mmsh://win.global.playstream.com/showcase/mathtv/trig_4.5_350k.wmv -threads 0 -r 15 -s 512x384 -sws_flags lanczos -pix_fmt yuv420p -maxrate 256k -bufsize 560k -acodec libmp3lame -ar 44100 -ab 32k -ac 2 -vol 256 -vcodec  libx264 -preset fast -f asf_stream -";
-                            startInfo.Arguments = " -v error -i mmsh://win.global.playstream.com/showcase/mathtv/trig_4.5_350k.wmv -r 15 -s 512x384 -acodec pcm_s16le -vcodec yuv4 -f asf_stream -";
-                            startInfo.CreateNoWindow = true;
-                            startInfo.RedirectStandardOutput = true;
-                            startInfo.RedirectStandardError = true; // 標準エラー
-                            startInfo.UseShellExecute = false;
-
-                            Console.WriteLine(startInfo.Arguments);
-
-                            pm.process2.StartInfo = startInfo;
-                            pm.process2.Start();
-
-                            pm.process2.BeginErrorReadLine(); // 標準エラーは別スレッドでとる
-
-                            int c = 0; // peyload size
-                            int h = 0; // header object size
-                            const int nBytes = 65535;
-                            byte[] buf = new byte[nBytes];
-
-                            // 標準出力はこのスレッドでとる
-                            BinaryReader br = new BinaryReader(pm.process2.StandardOutput.BaseStream);
-                            Boolean flg = true;
-                            AsfData asfData = AsfData.Instance; //これはシングルトン
-                            while (flg)
-                            {
-                                if (br.Read(buf, 0, 4) == 4)
-                                {
-                                    if (buf[0] == '$')
-                                    {
-                                        c = buf[2] + (buf[3] << 8); //ヘッダサイズ
-                                        if (br.Read(buf, 4, c) != c)
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-
-                                    if (buf[1] == 'H')// header packet
-                                    {
-                                        
-                                    }
-                                    else if (buf[1] == 'D')
-                                    { // Headerではない場合
-                                        if (
-                                        asfData.mmsh_status == MMSH_STATUS.MMSH_STATUS_ASF_HEADER_SEND
-                                        || asfData.mmsh_status == MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING
-                                        )
-                                        {
-                                            try
-                                            {
-                                                if (asfData.mms_sock != null && checkBox1.Checked)
-                                                {
-                                                    if (push_mode)
-                                                    //if (false)
-                                                    {
-                                                        byte[] dist = new byte[65535];
-                                                        int size = deleteMmsPreHeader(buf, c + 4, ref dist);
-                                                        asfData.mms_sock.Send(dist, size + 4, SocketFlags.None);
-                                                        asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
-
-                                                    }
-                                                    else
-                                                    {
-                                                        //int a = asfData.mms_sock.Available;
-                                                        //Random cRandom = new System.Random();
-
-                                                        ////TESTCODE
-                                                        //int r = cRandom.Next(10);
-                                                        //if (r != 0)
-                                                        //{
-                                                        asfData.mms_sock.Send(buf, c + 4, SocketFlags.None);
-
-                                                        //Console.WriteLine("ASF Data sent.");
-                                                        asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_ASF_DATA_SENDING;
-                                                        //a = asfData.mms_sock.Available;
-                                                        //}
-                                                    }
-                                                }
-                                            }
-                                            catch (SocketException ex)
-                                            {
-
-                                                Console.WriteLine("{0} Error code: {1}.", ex.Message, ex.ErrorCode);
-                                                this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput(ex.Message); }), new object[] { "" });
-                                                asfData.mmsh_status = MMSH_STATUS.MMSH_STATUS_NULL;
-                                            }
-                                        }
-                                        //else
-                                        //{
-                                        //    Console.WriteLine("unknown header: {0}", (char)buf[1]);
-                                        //}
-                                    }
-                                    else // 予期せぬヘッダ
-                                    {
-                                        Console.WriteLine("unknown header: {0}", (char)buf[1]);
-                                    }
-
-                                }
-                                else
-                                {
-                                    //EOF
-                                    this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput("入力がありません。配信を終了します。"); }), new object[] { "" });
-
-                                    break;
-                                }
-                            }
-                            //if (asfData.mms_sock != null)
-                            //{
-                            //    asfData.mms_sock.Close();
-                            //    asfData.mms_sock = null;
-
-                            //}
-                        }
-                        catch (ThreadAbortException)
-                        {
-                            //無視
-                        }
-                        catch (Exception exx)
-                        {
-                            //MessageBox.Show(exx.Message,
-                            //    "エラー",
-                            //    MessageBoxButtons.OK,
-                            //    MessageBoxIcon.Error);
-                            this.BeginInvoke(new Action<String>(delegate(String str) { this.logoutput(exx.Message); }), new object[] { "" });
-
-                            ProcessInitialize();
-
-                        }
-
-
-                    }));
-                    pm.th_ffmpeg2.Start();
-
-                }
-            }
+            }// end if (pm.process == null)
             
-            // closing
-            //this.button_disconnect.Enabled = true;
         }
 
         /// <summary>
@@ -1694,8 +1551,10 @@ namespace S2MMSH
 
 //todo
 //D&D対応 OK
-//ASFコメント追加
+//ASFコメント追加 OK
 //EOF時の自動切断 OK
-//ffmpegコンソール直修
-//バージョン管理
+//ffmpegコンソール直修 OK
+//バージョン管理 OK
+//VC1対応
+//ストリーム永続化
 //プレイリストクラスの生成

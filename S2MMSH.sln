@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S2MMSH", "S2MMSH\S2MMSH.csproj", "{090D65F6-8671-42FA-9D5E-344DFA8E8AC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication1", "WpfApplication1\WpfApplication1.csproj", "{F9220784-9749-48D3-8037-A9474846EE8E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S2MMSHdev", "S2MMSHdev\S2MMSHdev.csproj", "{FFD3FA34-F9BB-4882-B68B-85CD3369A885}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -17,14 +13,6 @@ Global
 		{090D65F6-8671-42FA-9D5E-344DFA8E8AC6}.Debug|x86.Build.0 = Debug|x86
 		{090D65F6-8671-42FA-9D5E-344DFA8E8AC6}.Release|x86.ActiveCfg = Release|x86
 		{090D65F6-8671-42FA-9D5E-344DFA8E8AC6}.Release|x86.Build.0 = Release|x86
-		{F9220784-9749-48D3-8037-A9474846EE8E}.Debug|x86.ActiveCfg = Debug|x86
-		{F9220784-9749-48D3-8037-A9474846EE8E}.Debug|x86.Build.0 = Debug|x86
-		{F9220784-9749-48D3-8037-A9474846EE8E}.Release|x86.ActiveCfg = Release|x86
-		{F9220784-9749-48D3-8037-A9474846EE8E}.Release|x86.Build.0 = Release|x86
-		{FFD3FA34-F9BB-4882-B68B-85CD3369A885}.Debug|x86.ActiveCfg = Debug|x86
-		{FFD3FA34-F9BB-4882-B68B-85CD3369A885}.Debug|x86.Build.0 = Debug|x86
-		{FFD3FA34-F9BB-4882-B68B-85CD3369A885}.Release|x86.ActiveCfg = Release|x86
-		{FFD3FA34-F9BB-4882-B68B-85CD3369A885}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
