@@ -9,12 +9,12 @@
 //*****************************************************************************
 
 #include "stdafx.h"
-#include "RAW2ES.h"
+#include "VC1EncWrapper.h"
 #include "VC1EncES.h"
 
-RAW2ES::RAW2ES(){}; // コンストラクタ
+VC1EncWrapper::VC1EncWrapper(){}; // コンストラクタ
 
-DWORD RAW2ES::Execute()
+DWORD VC1EncWrapper::Execute()
 {
     DWORD dwError = 0;
     char x = 0;

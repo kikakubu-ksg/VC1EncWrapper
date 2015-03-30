@@ -2,10 +2,10 @@
 #define __RAW2ES_H
 #include "stdafx.h"
 
-public ref class RAW2ES
+public ref class VC1EncWrapper
 {
 public:
-    RAW2ES();
+    VC1EncWrapper(); // constructer
     DWORD Execute();
 
 private:  

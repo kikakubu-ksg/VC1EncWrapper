@@ -88,8 +88,8 @@ private:
     BYTE   *m_pInputBuffer;
     BOOL    m_bColorFormat; // TRUE when user sets COLOR_FORMAT value(s).
     BOOL    m_bPARI; // TRUE when user sets PixelAspectRatioIndex.
-    wchar_t **m_ppArgv; // Pointer to command line string pointer.
-    int     m_iArgc;  // Args count.
+    //wchar_t **m_ppArgv; // Pointer to command line string pointer.
+    //int     m_iArgc;  // Args count.
 };
 
 #endif
