@@ -453,9 +453,9 @@
             this.label18.AutoSize = true;
             this.label18.Location = new System.Drawing.Point(212, 97);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(136, 12);
+            this.label18.Size = new System.Drawing.Size(116, 12);
             this.label18.TabIndex = 26;
-            this.label18.Text = "※CODECはWMV2/WMA2";
+            this.label18.Text = "※CODECはVC1/MP3";
             // 
             // tabControl1
             // 
