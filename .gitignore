@@ -34,3 +34,4 @@ ipch/
 S2MMSH/bin/Debug/S2MMSH.exe
 S2MMSH/bin/Debug/S2MMSH.pdb
 S2MMSH/bin/Release/*
+*.opensdf
