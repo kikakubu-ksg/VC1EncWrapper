@@ -220,34 +220,36 @@ DWORD CVC1EncWrapper::Encode()
     //    dwError = CreateVC1File();
     //}
 
+    // バッファは上で確保するのでいらない。
+
+    //if(ERR_OK == dwError)
+    //{
+    //    // Get the buffer size from the SDK.
+    //    dwError = m_pEncoder->GetMaxOutputBuffer(&dwOutputBufSize); 
+
+    //}
+
+    //if(ERR_OK == dwError)
+    //{
+    //    // Allocate the buffer for the compressed frame.
+    //    pOutputBuffer = new BYTE[dwOutputBufSize];
+
+    //    if(NULL == pOutputBuffer)
+    //    {
+    //        dwError = ERR_MEMORY;
+    //    }
+    //}
+
     if(ERR_OK == dwError)
     {
-        // Get the buffer size from the SDK.
-        dwError = m_pEncoder->GetMaxOutputBuffer(&dwOutputBufSize); 
+        //// Loop frame-by-frame.
+        //for(DWORD i = 0; i < dwFrameCount; i++)
+        //{
+        //    dwError = ReadFrame(i);
 
-    }
-
-    if(ERR_OK == dwError)
-    {
-        // Allocate the buffer for the compressed frame.
-        pOutputBuffer = new BYTE[dwOutputBufSize];
-
-        if(NULL == pOutputBuffer)
-        {
-            dwError = ERR_MEMORY;
-        }
-    }
-
-    if(ERR_OK == dwError)
-    {
-        // Loop frame-by-frame.
-        for(DWORD i = 0; i < dwFrameCount; i++)
-        {
-            dwError = ReadFrame(i);
-
-            if(ERR_OK == dwError)
-            {
-                wprintf_s(L"------------Frame %7d-----------\r", i);
+        //    if(ERR_OK == dwError)
+        //    {
+        //        wprintf_s(L"------------Frame %7d-----------\r", i);
 
                 // Clear the buffer before using it.
                 ZeroMemory(pOutputBuffer, dwOutputBufSize);
@@ -260,43 +262,43 @@ DWORD CVC1EncWrapper::Encode()
                                                   m_bTFF,
                                                   m_bRFF,
                                                   &ft);
-            }
+            //}
 
-            if (ERR_OK == dwError) 
-            { 
-                dwError = WriteFrame(pOutputBuffer, dwBufLen);                
-            }
-            else if(ERR_NO_OP_FRAME == dwError)
-            {
-                // Don't write for no-op frames, just move on.
-                continue;
-            }
-            else
-            {
-                // Encode frame error.
-                break;
-            }
-        } // i loop
+        //    if (ERR_OK == dwError) 
+        //    { 
+        //        dwError = WriteFrame(pOutputBuffer, dwBufLen);                
+        //    }
+        //    else if(ERR_NO_OP_FRAME == dwError)
+        //    {
+        //        // Don't write for no-op frames, just move on.
+        //        continue;
+        //    }
+        //    else
+        //    {
+        //        // Encode frame error.
+        //        break;
+        //    }
+        //} // i loop
     }
 
     if(ERR_OK == dwError)
     {
         // Flush any remaining frames.
-		while(ERR_NOMORE_FRAMES != dwError)
-		{
-			ZeroMemory(pOutputBuffer, dwOutputBufSize);
+      while(ERR_NOMORE_FRAMES != dwError)
+      {
+      ZeroMemory(pOutputBuffer, dwOutputBufSize);
 
-			dwError = m_pEncoder->Flush(pOutputBuffer, &dwBufLen, &qwTimeStampOut, &ft);
+      dwError = m_pEncoder->Flush(pOutputBuffer, &dwBufLen, &qwTimeStampOut, &ft);
 
-			if((ERR_OK == dwError || ERR_NOMORE_FRAMES == dwError)
-				&& (dwBufLen > 0))
-			{
-			  if (ERR_IO == WriteFrame(pOutputBuffer, dwBufLen))
-			  {
-				break;
-			  }
-			}
-		} 
+      if((ERR_OK == dwError || ERR_NOMORE_FRAMES == dwError)
+      && (dwBufLen > 0))
+      {
+      if (ERR_IO == WriteFrame(pOutputBuffer, dwBufLen))
+      {
+      break;
+      }
+      }
+      } 
     }
 
     if(ERR_NOMORE_FRAMES == dwError)
