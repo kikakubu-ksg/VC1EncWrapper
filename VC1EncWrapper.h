@@ -24,24 +24,13 @@ public:
     CVC1EncWrapper();
     DWORD Init();
     void Destroy();
-    DWORD Encode();
+    DWORD Encode(BYTE *pInputBuffer, BYTE *pOutputBuffer, INT64 i);
+    //DWORD GetCodecPrivateData();
+    DWORD ForceKeyFrame();
 
 private:  
 
-    // Video reader helper functions.
-    //DWORD OpenInputFile();
-    //void CloseInputFile();
-    DWORD ReadFrame(DWORD dwNumber) ;
-    DWORD get_frameCount();
-
-    // Video writer helper functions
-    //DWORD CreateVC1File (); 
-    //void CloseVC1File ();
-    DWORD WriteFrame(BYTE *pVC1Frame, DWORD dwLength);
- 
     // Utility functions.
-    //BOOL get_userConfigProps();
-    //BOOL get_userAdvancedProps();
     DWORD get_advancedProps();
     DWORD set_advancedProps();
     DWORD ShowStatistics();
@@ -76,12 +65,6 @@ private:
 
     // Instance of the VC-1 encoder class.
     class  CVC1Encoder *m_pEncoder;
-
-     // File paths and handles for media.
-    //WCHAR   m_wszInputFilePath[MAX_PATH];
-    //HANDLE  m_hInput;
-    //WCHAR   m_wszOutputFilePath[MAX_PATH];
-    //HANDLE  m_hOutput;
     
     // Settings-related variables.
     DWORD   m_dwInputFrameSize;
@@ -90,8 +73,9 @@ private:
     BYTE   *m_pOutputBuffer;
     BOOL    m_bColorFormat; // TRUE when user sets COLOR_FORMAT value(s).
     BOOL    m_bPARI; // TRUE when user sets PixelAspectRatioIndex.
-    //wchar_t **m_ppArgv; // Pointer to command line string pointer.
-    //int     m_iArgc;  // Args count.
+
+    BYTE   *m_pPrivCodecData; // Private Codec Data info
+    DWORD   m_dwPrivCodecDataSize;
 };
 
 #endif
