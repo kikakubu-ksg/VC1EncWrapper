@@ -20,6 +20,8 @@ namespace S2MMSH
         public ConnectButtonDelegate connectButtonStateDeligate;
         public DisconnectButtonDelegate disconnectButtonStateDeligate;
 
+        public CVC1EncWrapper vc1Enc;
+
         public MainForm()
         {
             InitializeComponent();
@@ -168,10 +170,12 @@ namespace S2MMSH
             if (!this.radioButton_reencode_1.Checked) 
             { 
                 /// TODO
+                vc1Enc = new CVC1EncWrapper();
                 // VC1enc initialize
-                // VC1encラッパーDLLロード
                 // パラメータ設定
-                // プライベートコーデック情報取得
+
+
+                
             }
 
 
