@@ -168,12 +168,39 @@ namespace S2MMSH
             this.button_disconnect.Enabled = true;
 
             if (!this.radioButton_reencode_1.Checked) 
-            { 
-                /// TODO
-                vc1Enc = new CVC1EncWrapper();
-                // VC1enc initialize
-                // パラメータ設定
+            {
+                try
+                {
+                    /// TODO
+                    vc1Enc = new CVC1EncWrapper();
+                    // VC1enc initialize/configure
+                    // パラメータ設定
+                    var dBitrate = Double.Parse(this.textBox_enc_bitrate_v.Text);
+                    vc1Enc.SetBitRate(dBitrate);
+                    vc1Enc.SetComplexityLevel(3); // 0-5 0:top quality 5:top performance
+                    vc1Enc.SetQP(8); // 1-31 quantitize paramater
+                    var dFrameRate = Double.Parse(this.textBox_enc_framerate.Text);
+                    vc1Enc.SetFrameRate(dFrameRate);
+                    vc1Enc.SetInterlacedSource(0); // false
+                    vc1Enc.SetMaxKeyFrameDistance(DWORD dwMaxKeyFrameDistance);
+                    vc1Enc.SetMaxHeight(DWORD dwMaxHeight);
+                    vc1Enc.SetMaxWidth(DWORD dwMaxWidth);
+                    vc1Enc.SetNumOfBFrames(DWORD dwNumOfBFrames);
+                    vc1Enc.SetPeakBitRate(DOUBLE dPeakBitRate);
+                    vc1Enc.SetProfile(DWORD dwProfile);
+                    vc1Enc.SetRateControlMode(DWORD dwRateControlMode);
+                    vc1Enc.SetVBVBufferInBytes(DWORD dwVBVBufferInBytes);
 
+
+
+
+                }
+                catch (Exception ex)
+                {
+                    
+                    logoutputDelegate("パラメータがです。: " + ex.Message);
+                    return;
+                }
 
                 
             }
