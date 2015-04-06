@@ -28,7 +28,36 @@ public:
     //DWORD GetCodecPrivateData();
     DWORD ForceKeyFrame();
 
-private:  
+    // config propaty getter/setter
+    DOUBLE GetBitRate();
+    DWORD  GetComplexityLevel();
+    DWORD  GetQP();
+    DOUBLE GetFrameRate();
+    BOOL   GetInterlacedSource();
+    DWORD  GetMaxKeyFrameDistance();
+    DWORD  GetMaxHeight();
+    DWORD  GetMaxWidth();
+    DWORD  GetNumOfBFrames();
+    DOUBLE GetPeakBitRate();
+    DWORD  GetProfile();
+    DWORD  GetRateControlMode();
+    DWORD  GetVBVBufferInBytes();
+
+    DWORD  SetBitRate(DOUBLE dBitRate);
+    DWORD  SetComplexityLevel(DWORD dwComplexityLevel);
+    DWORD  SetQP(DWORD dwQP);
+    DWORD  SetFrameRate(DOUBLE dFrameRate);
+    DWORD  SetInterlacedSource(BOOL bInterlacedSource);
+    DWORD  SetMaxKeyFrameDistance(DWORD dwMaxKeyFrameDistance);
+    DWORD  SetMaxHeight(DWORD dwMaxHeight);
+    DWORD  SetMaxWidth(DWORD dwMaxWidth);
+    DWORD  SetNumOfBFrames(DWORD dwNumOfBFrames);
+    DWORD  SetPeakBitRate(DOUBLE dPeakBitRate);
+    DWORD  SetProfile(DWORD dwProfile);
+    DWORD  SetRateControlMode(DWORD dwRateControlMode);
+    DWORD  SetVBVBufferInBytes(DWORD dwVBVBufferInBytes);
+
+//private:  
 
     // Utility functions.
     DWORD get_advancedProps();

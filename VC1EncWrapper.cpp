@@ -560,7 +560,233 @@ DWORD CVC1EncWrapper::set_advancedProps()
     return dwError;
 }
 
+////////////////////////////////////////////////////////
+//
+//  Configure Properties Getter and Setter
+//
+////////////////////////////////////////////////////////
+// Getter
+DOUBLE CVC1EncWrapper::GetBitRate()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dBitRate;
+}
+DWORD  CVC1EncWrapper::GetComplexityLevel()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwComplexityLevel;
+}
+DWORD  CVC1EncWrapper::GetQP()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwQP;
+}
+DOUBLE CVC1EncWrapper::GetFrameRate()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dFrameRate;
+}
+BOOL   CVC1EncWrapper::GetInterlacedSource()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->bInterlacedSource;
+}
+DWORD  CVC1EncWrapper::GetMaxKeyFrameDistance()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwMaxKeyFrameDistance;
+}
+DWORD  CVC1EncWrapper::GetMaxHeight()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwMaxHeight;
+}
+DWORD  CVC1EncWrapper::GetMaxWidth()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwMaxWidth;
+}
+DWORD  CVC1EncWrapper::GetNumOfBFrames()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwNumOfBFrames;
+}
+DOUBLE CVC1EncWrapper::GetPeakBitRate()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dPeakBitRate;
+}
+DWORD  CVC1EncWrapper::GetProfile()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwProfile;
+}
+DWORD  CVC1EncWrapper::GetRateControlMode()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwRateControlMode;
+}
+DWORD  CVC1EncWrapper::GetVBVBufferInBytes()
+{
+    assert(NULL != m_ConfigProps);
+    return m_ConfigProps->dwVBVBufferInBytes;
+}
 
-
-
+// Setter
+DWORD CVC1EncWrapper::SetBitRate(DOUBLE dBitRate)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dBitRate = dBitRate;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetComplexityLevel(DWORD dwComplexityLevel)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwComplexityLevel = dwComplexityLevel;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetQP(DWORD dwQP)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwQP = dwQP;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetFrameRate(DOUBLE dFrameRate)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dFrameRate = dFrameRate;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetInterlacedSource(BOOL bInterlacedSource)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->bInterlacedSource = bInterlacedSource;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetMaxKeyFrameDistance(DWORD dwMaxKeyFrameDistance)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwMaxKeyFrameDistance = dwMaxKeyFrameDistance;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetMaxHeight(DWORD dwMaxHeight)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwMaxHeight = dwMaxHeight;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetMaxWidth(DWORD dwMaxWidth)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwMaxWidth = dwMaxWidth;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetNumOfBFrames(DWORD dwNumOfBFrames)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwNumOfBFrames = dwNumOfBFrames;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetPeakBitRate(DOUBLE dPeakBitRate)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dPeakBitRate = dPeakBitRate;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetProfile(DWORD dwProfile)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwProfile = dwProfile;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetRateControlMode(DWORD dwRateControlMode)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwRateControlMode = dwRateControlMode;
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetVBVBufferInBytes(DWORD dwVBVBufferInBytes)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      m_ConfigProps->dwVBVBufferInBytes = dwVBVBufferInBytes;
+    }
+    return dwError;
+}
 
