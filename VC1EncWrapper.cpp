@@ -790,3 +790,29 @@ DWORD  CVC1EncWrapper::SetVBVBufferInBytes(DWORD dwVBVBufferInBytes)
     return dwError;
 }
 
+// advanced option wrappers
+DWORD  CVC1EncWrapper::SetClosedEntryPoint(BOOL  bClosedEntryPoint)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_pEncoder || NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      dwError = m_pEncoder->SetClosedEntryPoint(bClosedEntryPoint);
+    }
+    return dwError;
+}
+DWORD  CVC1EncWrapper::SetLookAhead(BOOL  bLookAhead)
+{
+    DWORD dwError = ERR_OK;
+    if(NULL == m_pEncoder || NULL == m_ConfigProps)
+    {
+      dwError = ERR_POINTER;
+    }
+    if(ERR_OK == dwError){
+      dwError = m_pEncoder->SetLookAhead(bLookAhead);
+    }
+    return dwError;
+}
+
