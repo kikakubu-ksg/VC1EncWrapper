@@ -27,6 +27,8 @@ public:
     DWORD Encode(BYTE *pInputBuffer, BYTE *pOutputBuffer, INT64 i);
     //DWORD GetCodecPrivateData();
     DWORD ForceKeyFrame();
+    DWORD SetClosedEntryPoint(BOOL  bClosedEntryPoint);
+    DWORD SetLookAhead(BOOL  bLookAhead);
 
     // config propaty getter/setter
     DOUBLE GetBitRate();
